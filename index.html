@@ -311,6 +311,24 @@
     .btn-glow-amber:active {
       transform: translateY(0) scale(0.98);
     }
+      /* Tactical Awwwards Modern Sliding Toggle */
+    #map-layer-toggle-container {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(71, 85, 105, 0.5);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #map-layer-toggle-container:hover {
+      border-color: rgba(148, 163, 184, 0.6);
+      box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.7), 0 0 18px rgba(16, 185, 129, 0.25);
+    }
+    #map-layer-slider {
+      will-change: transform, background, box-shadow;
+      transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1), background 300ms ease, box-shadow 300ms ease;
+    }
+
   </style>
 </head>
 <body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 selection:bg-emerald-500 selection:text-white">
@@ -588,17 +606,37 @@
 
           <!-- FLOATING GLASSMORPHISM CONTROLS OVERLAY -->
 
-          <!-- Top-Left Glass Card: Title & 3D Perspective Presets -->
-          <div class="absolute top-3 left-3 glass-panel p-3 max-w-[260px] space-y-2 pointer-events-auto">
+          <!-- Top-Left Glass Card: Title, Sliding Layer Toggle & 3D Presets -->
+          <div class="absolute top-3 left-3 glass-panel p-3 min-w-[285px] max-w-[315px] space-y-2.5 pointer-events-auto">
             <div class="flex items-center justify-between gap-2">
               <div class="flex items-center gap-1.5">
                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
                 <h4 class="text-xs font-bold text-white tracking-wide">3D Stubble &amp; Kiln Radar</h4>
               </div>
-              <span id="active-map-badge" class="text-[9px] bg-emerald-500/20 text-emerald-300 font-mono px-2 py-0.5 rounded border border-emerald-500/30">Cyber Dark 3D</span>
+              <span id="active-map-badge" class="text-[9px] bg-emerald-500/20 text-emerald-300 font-mono px-2 py-0.5 rounded border border-emerald-500/30">Kiln Compliance</span>
             </div>
             <p class="text-[10px] text-slate-400 leading-tight">Sangrur &amp; Malerkotla Surveillance Corridor &bull; Interactive 3D Orbit</p>
             
+            <!-- MODERN TACTILE AWWWARDS SLIDING TOGGLE -->
+            <div class="pt-0.5">
+              <div id="map-layer-toggle-container" onclick="window.handleToggleContainerClick(event)" class="bg-slate-900/80 backdrop-blur-md border border-slate-700/50 p-1 rounded-full flex items-center relative select-none cursor-pointer shadow-lg shadow-black/50 hover:border-slate-500 transition-all duration-300">
+                <!-- Smooth Sliding Active Indicator Pill -->
+                <div id="map-layer-slider" class="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-full bg-gradient-to-r from-emerald-600 to-teal-500 shadow-md shadow-emerald-500/40 border border-emerald-400/40 glow-green transition-all duration-300 ease-in-out"></div>
+                
+                <!-- Option 1: Kiln Compliance View -->
+                <button id="btn-view-compliance" onclick="window.setMapPerspectiveLayer('compliance')" class="relative z-10 w-1/2 py-1.5 rounded-full text-[11px] font-bold text-white transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block shadow-sm shadow-emerald-400"></span>
+                  <span>Kiln Compliance</span>
+                </button>
+                
+                <!-- Option 2: Satellite Heatmap -->
+                <button id="btn-view-satellite" onclick="window.setMapPerspectiveLayer('satellite')" class="relative z-10 w-1/2 py-1.5 rounded-full text-[11px] font-bold text-slate-400 hover:text-slate-200 transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer">
+                  <span class="w-2 h-2 rounded-full bg-amber-400 inline-block shadow-sm shadow-amber-400 animate-pulse"></span>
+                  <span>Satellite Heatmap</span>
+                </button>
+              </div>
+            </div>
+
             <!-- 3D Perspective Quick Switchers -->
             <div class="flex items-center gap-1 pt-1 border-t border-slate-800/80">
               <button onclick="window.setPerspective3D()" title="3D Oblique Perspective Angle" class="glass-btn px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1">
@@ -2031,6 +2069,72 @@
       });
     }
 
+    
+    // --- MODERN AWWWARDS SLIDING TOGGLE COMPONENT LOGIC ---
+    let currentPerspectiveLayer = 'compliance'; // 'compliance' or 'satellite'
+
+    window.setMapPerspectiveLayer = function(mode) {
+      currentPerspectiveLayer = mode;
+      const slider = document.getElementById('map-layer-slider');
+      const btnCompliance = document.getElementById('btn-view-compliance');
+      const btnSatellite = document.getElementById('btn-view-satellite');
+      const badgeEl = document.getElementById('active-map-badge');
+
+      if (mode === 'compliance') {
+        if (slider) {
+          slider.style.transform = 'translateX(0%)';
+          slider.className = 'absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-full bg-gradient-to-r from-emerald-600 to-teal-500 shadow-md shadow-emerald-500/40 border border-emerald-400/40 glow-green transition-all duration-300 ease-in-out';
+        }
+        if (btnCompliance) {
+          btnCompliance.classList.add('text-white');
+          btnCompliance.classList.remove('text-slate-400');
+        }
+        if (btnSatellite) {
+          btnSatellite.classList.remove('text-white');
+          btnSatellite.classList.add('text-slate-400');
+        }
+        if (badgeEl) badgeEl.textContent = 'Kiln Compliance';
+
+        // Switch to Dark Matter if satellite was active
+        if (window.setMapStyle3D && currentMapStyleKey !== 'dark') {
+          window.setMapStyle3D('dark');
+        }
+        renderMapLayers();
+        showToast('Kiln Compliance View', 'Displaying all 12 monitored brick kilns with co-firing quotas and deficit alerts.');
+      } else if (mode === 'satellite') {
+        if (slider) {
+          slider.style.transform = 'translateX(100%)';
+          slider.className = 'absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 shadow-md shadow-orange-500/40 border border-orange-400/40 glow-amber transition-all duration-300 ease-in-out';
+        }
+        if (btnCompliance) {
+          btnCompliance.classList.remove('text-white');
+          btnCompliance.classList.add('text-slate-400');
+        }
+        if (btnSatellite) {
+          btnSatellite.classList.add('text-white');
+          btnSatellite.classList.remove('text-slate-400');
+        }
+        if (badgeEl) badgeEl.textContent = 'Satellite Heatmap';
+
+        // Switch to Satellite 3D
+        if (window.setMapStyle3D && currentMapStyleKey !== 'satellite') {
+          window.setMapStyle3D('satellite');
+        }
+        isFireLayerVisible = true;
+        const switchEl = document.getElementById('fire-toggle-switch');
+        if (switchEl) switchEl.classList.add('active');
+        renderMapLayers();
+        showToast('Satellite Heatmap Active', 'Switched to Esri Satellite imagery with live NASA FIRMS active fire clusters.');
+      }
+    };
+
+    window.handleToggleContainerClick = function(e) {
+      if (e.target.tagName !== 'BUTTON' && !e.target.closest('button')) {
+        const nextMode = currentPerspectiveLayer === 'compliance' ? 'satellite' : 'compliance';
+        window.setMapPerspectiveLayer(nextMode);
+      }
+    };
+
     window.setMapStyle3D = function(styleKey) {
       if (!mapInstance || !STYLES_3D[styleKey]) return;
       currentMapStyleKey = styleKey;
@@ -2053,6 +2157,29 @@
           }
         }
       });
+
+      
+      // Sync sliding toggle indicator if style was changed via top-right buttons
+      const slider = document.getElementById('map-layer-slider');
+      if (slider) {
+        if (styleKey === 'dark') {
+          slider.style.transform = 'translateX(0%)';
+          slider.className = 'absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-full bg-gradient-to-r from-emerald-600 to-teal-500 shadow-md shadow-emerald-500/40 border border-emerald-400/40 glow-green transition-all duration-300 ease-in-out';
+          document.getElementById('btn-view-compliance')?.classList.add('text-white');
+          document.getElementById('btn-view-compliance')?.classList.remove('text-slate-400');
+          document.getElementById('btn-view-satellite')?.classList.remove('text-white');
+          document.getElementById('btn-view-satellite')?.classList.add('text-slate-400');
+          currentPerspectiveLayer = 'compliance';
+        } else if (styleKey === 'satellite') {
+          slider.style.transform = 'translateX(100%)';
+          slider.className = 'absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 shadow-md shadow-orange-500/40 border border-orange-400/40 glow-amber transition-all duration-300 ease-in-out';
+          document.getElementById('btn-view-satellite')?.classList.add('text-white');
+          document.getElementById('btn-view-satellite')?.classList.remove('text-slate-400');
+          document.getElementById('btn-view-compliance')?.classList.remove('text-white');
+          document.getElementById('btn-view-compliance')?.classList.add('text-slate-400');
+          currentPerspectiveLayer = 'satellite';
+        }
+      }
 
       mapInstance.setStyle(STYLES_3D[styleKey]);
       mapInstance.once('style.load', () => {
