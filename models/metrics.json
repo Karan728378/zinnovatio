@@ -1,0 +1,47 @@
+{
+  "yield_predictor": {
+    "model_type": "RandomForestRegressor",
+    "features": [
+      "acres",
+      "crop_variety_idx",
+      "grain_yield_qtl_acre",
+      "ndvi",
+      "cutting_height_cm"
+    ],
+    "train_samples": 480,
+    "test_samples": 120,
+    "test_r2": 0.982,
+    "test_mae_tonnes": 3.26
+  },
+  "price_predictor": {
+    "model_type": "DecisionTreeRegressor",
+    "features": [
+      "distance_km",
+      "form_idx",
+      "moisture_pct",
+      "harvest_week",
+      "supply_density_index"
+    ],
+    "train_samples": 480,
+    "test_samples": 120,
+    "test_r2": 0.967,
+    "test_mae_rupees": 52.99
+  },
+  "fire_risk_classifier": {
+    "model_type": "DecisionTreeClassifier",
+    "features": [
+      "days_to_wheat_sowing",
+      "dist_to_kiln_km",
+      "machinery_access_score",
+      "cell_fire_density"
+    ],
+    "classes": [
+      "Low Risk",
+      "Moderate Risk",
+      "High Risk"
+    ],
+    "train_samples": 480,
+    "test_samples": 120,
+    "test_accuracy": 0.7
+  }
+}
