@@ -329,6 +329,21 @@
       transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1), background 300ms ease, box-shadow 300ms ease;
     }
 
+      /* Geographic Area & District Map Labels */
+    .region-map-label {
+      pointer-events: none !important;
+      z-index: 4 !important;
+      user-select: none;
+    }
+    .region-label-pill {
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(71, 85, 105, 0.65);
+      box-shadow: 0 10px 24px -4px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+    }
+
   </style>
 </head>
 <body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 selection:bg-emerald-500 selection:text-white">
@@ -1826,6 +1841,18 @@
 
     let currentMapStyleKey = 'dark';
     let kilnMarkers3D = [];
+    let regionLabels3D = [];
+
+    // Key Punjab Pilot Geographic Regions & Districts for Map Labels
+    const REGION_HUBS = [
+      { name: 'Sangrur District', type: 'District HQ', lat: 30.25, lon: 75.84 },
+      { name: 'Malerkotla Hub', type: 'Industrial Cluster', lat: 30.6115, lon: 75.90 },
+      { name: 'Dhuri Cluster', type: 'Paddy Corridor', lat: 30.31, lon: 75.91 },
+      { name: 'Sunam Sector', type: 'High Density Zone', lat: 30.18, lon: 75.79 },
+      { name: 'Longowal Sector', type: 'Pilot Cluster', lat: 30.29, lon: 75.68 },
+      { name: 'Ahmedgarh Hub', type: 'Border Sector', lat: 30.42, lon: 75.75 },
+      { name: 'Bhawanigarh Area', type: 'Transit Belt', lat: 30.37, lon: 76.02 }
+    ];
     let isFireLayerVisible = true;
     let currentStateFilter = 'all';
     let mapFilter = 'all';
@@ -1983,6 +2010,33 @@
       kilnMarkers3D.forEach(m => m.remove());
       kilnMarkers3D = [];
 
+      // Render Floating Geographic Area & District Name Labels
+      if (typeof regionLabels3D !== 'undefined') {
+        regionLabels3D.forEach(m => m.remove());
+        regionLabels3D = [];
+
+        REGION_HUBS.forEach(hub => {
+          const el = document.createElement('div');
+          el.className = 'region-map-label';
+          el.innerHTML = `
+            <div class="flex items-center gap-1.5 region-label-pill px-2.5 py-1 text-slate-200">
+              <span class="w-1.5 h-1.5 rounded-full bg-sky-400 shadow-sm shadow-sky-400 animate-pulse"></span>
+              <span class="font-bold text-white text-[11px] tracking-wide whitespace-nowrap">${hub.name}</span>
+              <span class="text-[9px] text-slate-400 font-mono hidden sm:inline">&bull; ${hub.type}</span>
+            </div>
+          `;
+
+          const labelMarker = new maplibregl.Marker({
+            element: el,
+            anchor: 'center'
+          })
+            .setLngLat([hub.lon, hub.lat])
+            .addTo(mapInstance);
+
+          regionLabels3D.push(labelMarker);
+        });
+      }
+
       KILNS.forEach(k => {
         const needs = calculateKilnNeeds(k.kiln_id);
         const meets = needs.status === 'meets_target';
@@ -2011,41 +2065,50 @@
         const barWidth = Math.min(100, Math.round((needs.complianceShare / 0.30) * 100));
 
         const popupHtml = `
-          <div class="text-xs space-y-2 p-1 max-w-[280px]">
-            <div class="flex items-start justify-between gap-2 border-b border-slate-700/80 pb-1.5">
+          <div class="text-xs space-y-2.5 p-1 max-w-[290px]">
+            <div class="flex items-start justify-between gap-2 border-b border-slate-700/80 pb-2">
               <div>
-                <span class="font-bold text-white text-[13px] tracking-tight">${k.name}</span>
-                <div class="text-[10px] text-amber-300 font-medium">${stateName === 'Punjab' ? '🌾 Punjab Cluster' : '🏭 Haryana Border'} &bull; ${k.village}</div>
+                <span class="font-bold text-white text-[13px] tracking-tight flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full ${meets ? 'bg-emerald-400 shadow-sm shadow-emerald-400' : 'bg-rose-400 shadow-sm shadow-rose-400'}"></span>
+                  <span>${k.name}</span>
+                </span>
+                <div class="text-[11px] text-amber-300 font-semibold mt-0.5 flex items-center gap-1">
+                  <span>📍 ${k.village} Village</span>
+                  <span class="text-slate-400">&bull;</span>
+                  <span class="text-slate-300">${stateName === 'Punjab' ? 'Punjab Cluster' : 'Haryana Border'}</span>
+                </div>
+                <div class="text-[9px] text-slate-400 font-mono mt-0.5">GPS: ${k.lat.toFixed(4)}°N, ${k.lon.toFixed(4)}°E</div>
               </div>
-              <span class="text-[9px] px-2 py-0.5 rounded-full font-extrabold uppercase shrink-0 ${meets ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'}">
-                ${meets ? 'Target Met (≥30%)' : 'Below Target'}
+              <span class="text-[9px] px-2 py-0.5 rounded-full font-extrabold uppercase shrink-0 ${meets ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 glow-green' : 'bg-rose-500/20 text-rose-300 border border-rose-500/40 glow-red'}">
+                ${meets ? 'Target Met (≥30%)' : 'Deficit Shortfall'}
               </span>
             </div>
 
             <!-- Co-firing Progress Bar -->
-            <div class="space-y-1">
+            <div class="space-y-1 bg-slate-900/60 p-2 rounded-xl border border-slate-800/80">
               <div class="flex justify-between text-[10px]">
-                <span class="text-slate-400">Co-firing Share:</span>
-                <strong class="${meets ? 'text-emerald-400' : 'text-rose-400'} font-bold">${pct}% / 30%</strong>
+                <span class="text-slate-400">Co-firing Compliance:</span>
+                <strong class="${meets ? 'text-emerald-400' : 'text-rose-400'} font-bold font-mono">${pct}% / 30.0% Target</strong>
               </div>
-              <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden border border-slate-700/60">
-                <div class="h-full ${meets ? 'bg-emerald-500' : 'bg-rose-500'} transition-all duration-500 rounded-full" style="width: ${barWidth}%;"></div>
+              <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden border border-slate-700/60 relative">
+                <div class="h-full ${meets ? 'bg-gradient-to-r from-emerald-500 to-teal-400' : 'bg-gradient-to-r from-rose-500 to-amber-500'} transition-all duration-500 rounded-full" style="width: ${barWidth}%;"></div>
               </div>
             </div>
 
+            <!-- 4 Statutory Metrics -->
             <div class="grid grid-cols-2 gap-1.5 text-[10px] bg-slate-900/60 p-2 rounded-xl border border-slate-800/80 text-slate-300">
-              <div>Monthly Fuel: <strong class="text-white">${k.monthly_fuel_tonnes} t</strong></div>
-              <div>Straw Quota: <strong class="text-sky-300">${needs.strawNeededTonnes} t</strong></div>
-              <div>Delivered: <strong class="text-emerald-400 font-bold">${needs.deliveredTonnes} t</strong></div>
-              <div>Shortfall: <strong class="text-rose-400 font-bold">${needs.gapTonnes} t</strong></div>
+              <div>Monthly Fuel: <strong class="text-white font-mono">${k.monthly_fuel_tonnes.toFixed(1)} t</strong></div>
+              <div>Straw Quota (30%): <strong class="text-sky-300 font-mono">${needs.strawNeededTonnes.toFixed(1)} t</strong></div>
+              <div>Delivered: <strong class="text-emerald-400 font-bold font-mono">${needs.deliveredTonnes.toFixed(1)} t</strong></div>
+              <div>Remaining Gap: <strong class="${meets ? 'text-emerald-400' : 'text-rose-400'} font-bold font-mono">${needs.gapTonnes.toFixed(1)} t</strong></div>
             </div>
 
-            <div class="pt-1.5 border-t border-slate-700/80 flex items-center justify-between gap-2">
-              <a href="https://www.google.com/maps/search/?api=1&query=${k.lat},${k.lon}" target="_blank" rel="noopener noreferrer" class="bg-slate-800 hover:bg-slate-700 text-sky-400 hover:text-sky-300 text-[10px] font-semibold px-2 py-1 rounded-lg border border-slate-700 flex items-center gap-1 transition">
+            <div class="pt-2 border-t border-slate-700/80 flex items-center justify-between gap-2">
+              <a href="https://www.google.com/maps/search/?api=1&query=${k.lat},${k.lon}" target="_blank" rel="noopener noreferrer" class="bg-slate-800 hover:bg-slate-700 text-sky-400 hover:text-sky-300 text-[10px] font-semibold px-2.5 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1 transition">
                 <span>📍 GPS Map ↗</span>
               </a>
-              <button onclick="window.inspectKiln('${k.kiln_id}')" class="bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white text-[11px] font-bold px-3 py-1 rounded-lg shadow-md shadow-emerald-950/50 transition flex items-center gap-1">
-                <span>Match Straw &raquo;</span>
+              <button onclick="window.inspectKiln('${k.kiln_id}')" class="btn-glow-primary text-white text-[11px] font-bold px-3 py-1.5 rounded-lg shadow-md transition flex items-center gap-1.5 cursor-pointer">
+                <span>Open Kiln Calculator ➔</span>
               </button>
             </div>
           </div>
