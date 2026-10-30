@@ -8,6 +8,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Optional, Dict, Any
 from contextlib import asynccontextmanager
 import os
+import sys
+
+# Load environment variables (.env)
+try:
+    from dotenv import load_dotenv
+    _base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    load_dotenv(os.path.join(_base_dir, "backend", ".env"))
+    load_dotenv(os.path.join(_base_dir, ".env"))
+except ImportError:
+    pass
 
 from .db import init_db, get_connection, load_config, get_next_id
 from .schemas import (
@@ -53,7 +63,11 @@ def get_health():
 
 @app.get("/config")
 def get_config():
-    return load_config()
+    cfg = load_config()
+    firms_key = os.environ.get("FIRMS_MAP_KEY") or os.environ.get("NASA_FIRMS_MAP_KEY")
+    if isinstance(cfg, dict):
+        cfg["firms_live_configured"] = bool(firms_key)
+    return cfg
 
 @app.get("/supply/map", response_model=List[SupplyCellItem])
 def get_supply_map():
@@ -71,6 +85,51 @@ def get_supply_map():
             supply_index=r["supply_index"]
         ) for r in rows
     ]
+
+@app.get("/supply/status")
+def get_supply_status():
+    key = os.environ.get("FIRMS_MAP_KEY") or os.environ.get("NASA_FIRMS_MAP_KEY") or ""
+    has_key = bool(key)
+    masked = key[:4] + "..." + key[-4:] if len(key) > 8 else ("***" if key else None)
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    cache_path = os.path.join(base_dir, "data", "raw", "firms_cache.csv")
+    has_cache = os.path.exists(cache_path)
+    return {
+        "firms_configured": has_key,
+        "api_key_masked": masked,
+        "has_live_cache": has_cache,
+        "source": "NASA FIRMS VIIRS (SNPP / NOAA)" if has_key else "Bundled Satellite Detections",
+        "pilot_bbox": [74.3, 29.5, 77.4, 32.5]
+    }
+
+@app.post("/supply/refresh")
+def refresh_supply_data(force: bool = False):
+    try:
+        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        if base_dir not in sys.path:
+            sys.path.insert(0, base_dir)
+        from pipeline.firms_pipeline import download_firms_data, process_grid_cells
+        df = download_firms_data(force_refresh=force)
+        cells_df = process_grid_cells(df)
+        
+        # Reload database table
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute("DELETE FROM supply_cells;")
+        for _, r in cells_df.iterrows():
+            cur.execute(
+                "INSERT INTO supply_cells (cell_id, lat, lon, fire_count_last_season, supply_index) VALUES (?, ?, ?, ?, ?)",
+                (r["cell_id"], float(r["lat"]), float(r["lon"]), int(r["fire_count_last_season"]), float(r["supply_index"]))
+            )
+        conn.commit()
+        conn.close()
+        return {
+            "status": "success",
+            "message": f"Successfully refreshed {len(cells_df)} supply cells from NASA FIRMS.",
+            "cells_count": len(cells_df)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/kilns", response_model=List[KilnItem])
 def get_kilns():
