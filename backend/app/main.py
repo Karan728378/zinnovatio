@@ -488,7 +488,7 @@ def record_delivery(req: CreateDeliveryRequest):
         try:
             from zoneinfo import ZoneInfo
         except ImportError:
-            from backports.zoneinfo import ZoneInfo
+            from backports.zoneinfo import ZoneInfo  # type: ignore
         d = datetime.date.fromisoformat(req.date)
         min_date = datetime.date(2025, 11, 1)
         today_ist = datetime.datetime.now(ZoneInfo("Asia/Kolkata")).date()
@@ -515,11 +515,11 @@ def record_delivery(req: CreateDeliveryRequest):
             conn.rollback()
             raise HTTPException(status_code=404, detail=f"Supplier {req.supplier_id} not found")
 
-        if req.form != sup["straw_form"]:
+        if (req.form == "pellet" and sup["straw_form"] != "pellet") or (sup["straw_form"] == "pellet" and req.form != "pellet"):
             conn.rollback()
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=f"Delivery form '{req.form}' does not match supplier straw form '{sup['straw_form']}'."
+                detail=f"Delivery form '{req.form}' is incompatible with supplier straw form '{sup['straw_form']}'."
             )
 
         available = float(sup["available_tonnes"])

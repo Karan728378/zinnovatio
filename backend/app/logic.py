@@ -125,6 +125,7 @@ def rank_suppliers(kiln: Dict[str, Any], suppliers: List[Dict[str, Any]], cfg: D
             "supplier_id": s["supplier_id"],
             "name": s["name"],
             "kind": s["kind"],
+            "role": s.get("role") or s.get("kind"),
             "form": form,
             "distance_km": dist,
             "price_per_tonne": price,

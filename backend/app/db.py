@@ -99,7 +99,8 @@ def init_db(force_reload_seeds: bool = False, db_path: Optional[str] = None):
         village TEXT NOT NULL,
         straw_form TEXT NOT NULL,
         price_per_tonne REAL NOT NULL,
-        available_tonnes REAL NOT NULL CHECK (available_tonnes >= 0)
+        available_tonnes REAL NOT NULL CHECK (available_tonnes >= 0),
+        role TEXT DEFAULT 'Supplier'
     );
     """)
 
@@ -186,6 +187,12 @@ def init_db(force_reload_seeds: bool = False, db_path: Optional[str] = None):
     END;
     """)
 
+        # Ensure role column exists on suppliers table
+    cur.execute("PRAGMA table_info(suppliers);")
+    sup_cols = [r[1] for r in cur.fetchall()]
+    if "role" not in sup_cols:
+        cur.execute("ALTER TABLE suppliers ADD COLUMN role TEXT DEFAULT 'Supplier';")
+
     # Record migration version 1
     cur.execute("INSERT OR IGNORE INTO schema_version (version, applied_at) VALUES (1, datetime('now'));")
 
@@ -230,9 +237,10 @@ def init_db(force_reload_seeds: bool = False, db_path: Optional[str] = None):
     if cur.fetchone()[0] == 0 and os.path.exists(SUPPLIERS_CSV):
         df_sup = pd.read_csv(SUPPLIERS_CSV)
         for _, r in df_sup.iterrows():
+            role_val = r["role"] if "role" in df_sup.columns else r["kind"]
             cur.execute(
-                "INSERT OR IGNORE INTO suppliers (supplier_id, name, kind, lat, lon, village, straw_form, price_per_tonne, available_tonnes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (r["supplier_id"], r["name"], r["kind"], float(r["lat"]), float(r["lon"]), r["village"], r["straw_form"], float(r["price_per_tonne"]), float(r["available_tonnes"]))
+                "INSERT OR IGNORE INTO suppliers (supplier_id, name, kind, lat, lon, village, straw_form, price_per_tonne, available_tonnes, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (r["supplier_id"], r["name"], r["kind"], float(r["lat"]), float(r["lon"]), r["village"], r["straw_form"], float(r["price_per_tonne"]), float(r["available_tonnes"]), role_val)
             )
 
     # Idempotent Seed: Deliveries (and initialize genesis receipt chain)

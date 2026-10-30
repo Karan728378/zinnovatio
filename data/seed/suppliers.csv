@@ -1,16 +1,16 @@
-supplier_id,name,kind,lat,lon,village,straw_form,price_per_tonne,available_tonnes
-S001,Sample Farmer 1,farmer,30.26,75.85,Sangrur,bale,1400.0,45.0
-S002,Sample Farmer 2,farmer,30.32,75.92,Dhuri,chopped,1550.0,30.0
-S003,Sample Aggregator 1,aggregator,30.2,75.8,Sunam,bale,1500.0,80.0
-S004,Sample Pellet Unit 1,pellet_unit,30.28,75.88,Sangrur,pellet,2400.0,120.0
-S005,Sample Aggregator,aggregator,30.6115,75.9,Malerkotla,chopped,1800.0,40.0
-S006,Sample Farmer 3,farmer,30.43,75.76,Ahmedgarh,bale,1350.0,25.0
-S007,Sample Farmer 4,farmer,30.14,75.96,Lehragaga,chopped,1600.0,35.0
-S008,Sample Aggregator 2,aggregator,30.36,76.0,Bhawanigarh,chopped,1750.0,60.0
-S009,Sample Pellet Unit 2,pellet_unit,30.45,75.94,Amargarh,pellet,2500.0,150.0
-S010,Sample Farmer 5,farmer,30.3,75.7,Longowal,bale,1450.0,20.0
-S011,Sample Aggregator 3,aggregator,30.1,75.87,Dirba,bale,1520.0,70.0
-S012,Sample Farmer 6,farmer,30.22,76.02,Moonak,chopped,1650.0,28.0
-S013,Sample Pellet Unit 3,pellet_unit,30.19,75.82,Sunam,pellet,2350.0,100.0
-S014,Sample Farmer 7,farmer,30.35,75.79,Sherpur,bale,1380.0,32.0
-S015,Sample Aggregator 4,aggregator,30.33,75.9,Dhuri,chopped,1700.0,55.0
+supplier_id,name,role,kind,lat,lon,village,straw_form,price_per_tonne,available_tonnes
+S001,Sangrur Baler Union,CHC Center,aggregator,30.26,75.85,Sangrur,bale,1400.0,45.0
+S002,Dhuri Biomass Aggregator,Aggregator Hub,aggregator,30.32,75.92,Dhuri,bale,1550.0,50.0
+S003,Sunam Farmers Cooperative,Lead Farmer,farmer,30.2,75.8,Sunam,bale,1450.0,80.0
+S004,Sangrur Bio-Pellets Unit,Pellet Manufacturer,fpo_depot,30.28,75.88,Sangrur,pellet,2400.0,120.0
+S005,Malerkotla Farmers FPO,Cooperative FPO,fpo_depot,30.6115,75.9,Malerkotla,bale,1600.0,40.0
+S006,Ahmedgarh Kisan Union,Farmer Group,farmer,30.43,75.76,Ahmedgarh,bale,1350.0,25.0
+S007,Lehragaga Aggregators Network,Aggregator Hub,aggregator,30.14,75.96,Lehragaga,bale,1520.0,35.0
+S008,Bhawanigarh Biomass Aggregation,Aggregator Hub,aggregator,30.36,76.0,Bhawanigarh,bale,1550.0,60.0
+S009,Amargarh Green Fuel Depot,Pellet Depot,fpo_depot,30.45,75.94,Amargarh,pellet,2500.0,150.0
+S010,Longowal Progressive Farmers,Farmer Group,farmer,30.3,75.7,Longowal,bale,1420.0,20.0
+S011,Dirba Rural Baler Cooperative,CHC Center,aggregator,30.1,75.87,Dirba,bale,1500.0,70.0
+S012,Moonak Farmers Producer Group,Cooperative Farmer,farmer,30.22,76.02,Moonak,bale,1400.0,28.0
+S013,Sunam Biofuel Depot,Pellet Depot,fpo_depot,30.19,75.82,Sunam,pellet,2350.0,100.0
+S014,Sherpur Biomass Depot,Storage Depot,fpo_depot,30.35,75.79,Sherpur,bale,1480.0,32.0
+S015,Dhuri Farmer Collective,Farmer Group,farmer,30.33,75.9,Dhuri,bale,1500.0,55.0

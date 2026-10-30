@@ -1,7 +1,7 @@
 """
 tests/test_frontend_sync.py
 Verifies synchronization across frontend/index.html, index.html, and paralimitra_app.html,
-and validates frontend hygiene rules.
+and validates frontend interactive controls, map sizing, and offline fallbacks.
 """
 import os
 import hashlib
@@ -46,7 +46,6 @@ class TestFrontendSyncAndHygiene(unittest.TestCase):
         with open(SOURCE, "r", encoding="utf-8") as f:
             content = f.read()
 
-        # Check that receipt hash does not use Math.random
         self.assertNotIn(
             "receipt-hash').textContent = Math.random()",
             content,
@@ -63,6 +62,63 @@ class TestFrontendSyncAndHygiene(unittest.TestCase):
             "Frontend must support Punjabi language option"
         )
 
+    def test_map_container_has_explicit_css_dimensions(self):
+        """Map container must have explicit CSS height and width to prevent zero-height collapse."""
+        with open(SOURCE, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        self.assertIn('id="regulator-map"', content)
+        self.assertTrue(
+            'min-height: 580px' in content and 'height: 100%' in content,
+            "Map container #regulator-map must have explicit height & min-height"
+        )
+
+    def test_offline_cdn_fallbacks_present(self):
+        """MapLibre and Leaflet tags must include onerror fallbacks for offline reliability."""
+        with open(SOURCE, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        self.assertIn("onerror=\"this.onerror=null;this.href='/static/maplibre-gl.css';", content)
+        self.assertIn("onerror=\"this.onerror=null;var s=document.createElement('script');s.src='/static/maplibre-gl.js';", content)
+
+    def test_interactive_action_buttons_present(self):
+        """Auto-dispatch, FIRMS hours, and receipt audit buttons must exist with handlers."""
+        with open(SOURCE, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        self.assertIn("openAutoDispatchModal", content)
+        self.assertIn("openSatelliteHoursModal", content)
+        self.assertIn("openReceiptAuditModal", content)
+        self.assertIn("btn-auto-dispatch-action", content)
+        self.assertIn("btn-satellite-hours-action", content)
+        self.assertIn("btn-receipt-audit-action", content)
+
+    def test_caqm_direction_92_and_month_schedule_controls(self):
+        """CAQM Direction 92 pellet filter and month escalation schedule must be interactive."""
+        with open(SOURCE, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        self.assertIn("updateEligibilityMode", content)
+        self.assertIn("pellet_only", content)
+        self.assertIn("updateMonthFilter", content)
+        self.assertIn("month-filter", content)
+
+    def test_async_syntax_validity_on_submit_delivery(self):
+        """submitQuickDelivery must be an async function to avoid syntax errors with await."""
+        with open(SOURCE, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        self.assertIn("window.submitQuickDelivery = async function", content)
+
+    def test_pilot_region_hubs_present(self):
+        """Key Punjab pilot hubs must be defined for floating map labels."""
+        with open(SOURCE, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        self.assertIn("Sangrur District", content)
+        self.assertIn("Malerkotla Hub", content)
+        self.assertIn("Dhuri Cluster", content)
+        self.assertIn("Sunam Sector", content)
+
 if __name__ == "__main__":
     unittest.main()
-

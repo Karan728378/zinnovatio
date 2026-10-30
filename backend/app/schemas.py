@@ -53,6 +53,7 @@ class RankedSupplier(BaseModel):
     supplier_id: str
     name: str
     kind: str
+    role: Optional[str] = None
     form: str
     distance_km: float
     price_per_tonne: float

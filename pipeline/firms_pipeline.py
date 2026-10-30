@@ -10,6 +10,7 @@ import math
 import json
 import io
 import tempfile
+from datetime import datetime, timezone, timedelta
 import pandas as pd
 import requests
 
@@ -74,8 +75,8 @@ def download_firms_data(map_key: str = None, day_range: int = 5, force_refresh: 
             try:
                 with open(meta_path, "r", encoding="utf-8") as mf:
                     meta = json.load(mf)
-                fetch_time = datetime.datetime.fromisoformat(meta["fetched_at_utc"].replace("Z", "+00:00"))
-                age = (datetime.datetime.now(datetime.timezone.utc) - fetch_time).total_seconds() / 3600.0
+                fetch_time = datetime.fromisoformat(meta["fetched_at_utc"].replace("Z", "+00:00"))
+                age = (datetime.now(timezone.utc) - fetch_time).total_seconds() / 3600.0
                 if age > ttl_hours:
                     is_fresh = False
             except Exception:
@@ -128,7 +129,7 @@ def download_firms_data(map_key: str = None, day_range: int = 5, force_refresh: 
             temp_name = tf.name
         os.replace(temp_name, cache_path)
 
-        now_utc = datetime.datetime.now(datetime.timezone.utc).isoformat()
+        now_utc = datetime.now(timezone.utc).isoformat()
         meta_info = {
             "fetched_at_utc": now_utc,
             "detections_count": len(combined),
