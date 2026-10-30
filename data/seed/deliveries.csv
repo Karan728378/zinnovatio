@@ -1,0 +1,11 @@
+delivery_id,kiln_id,supplier_id,date,tonnes,form,photo_ref
+D001,K001,S001,2026-11-01,15.0,bale,slip_001.jpg
+D002,K001,S004,2026-11-02,15.0,pellet,slip_002.jpg
+D003,K002,S002,2026-11-01,12.0,chopped,slip_003.jpg
+D004,K002,S015,2026-11-02,12.0,chopped,slip_004.jpg
+D005,K003,S005,2026-11-01,10.0,chopped,slip_005.jpg
+D006,K004,S003,2026-11-01,8.0,bale,slip_006.jpg
+D007,K005,S006,2026-11-01,6.0,bale,slip_007.jpg
+D008,K006,S007,2026-11-02,6.0,chopped,slip_008.jpg
+D009,K007,S010,2026-11-02,6.0,bale,slip_009.jpg
+D010,K008,S008,2026-11-02,6.0,chopped,slip_010.jpg
