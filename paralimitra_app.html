@@ -13,82 +13,136 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #0b1120;
-      color: #f1f5f9;
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+    
+    :root {
+      --primary: #10b981;
+      --primary-glow: rgba(16, 185, 129, 0.45);
+      --danger: #ef4444;
+      --danger-glow: rgba(239, 68, 68, 0.45);
+      --warning: #f59e0b;
+      --warning-glow: rgba(245, 158, 11, 0.45);
+      --bg-deep: #060913;
+      --card-glass: rgba(15, 23, 42, 0.75);
+      --card-border: rgba(255, 255, 255, 0.1);
     }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #060913;
+      background-image: 
+        radial-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px),
+        radial-gradient(circle at 10% 15%, rgba(16, 185, 129, 0.09) 0%, transparent 40%),
+        radial-gradient(circle at 90% 85%, rgba(56, 189, 248, 0.09) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.045) 0%, transparent 50%);
+      background-size: 24px 24px, 100% 100%, 100% 100%, 100% 100%;
+      background-attachment: fixed;
+      color: #f1f5f9;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
     .custom-scrollbar::-webkit-scrollbar {
       width: 6px;
       height: 6px;
     }
     .custom-scrollbar::-webkit-scrollbar-track {
-      background: #1e293b;
+      background: #0f172a;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
       background: #475569;
-      border-radius: 3px;
     }
-    .leaflet-popup-content-wrapper, .leaflet-popup-tip {
-      background: #1e293b !important;
-      color: #f8fafc !important;
-      border: 1px solid #334155;
-      border-radius: 8px;
-    }
-    .leaflet-container {
-      background: #0f172a !important;
-    }
-    @keyframes pulse-subtle {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.6; }
-    }
-    .pulse-sync {
-      animation: pulse-subtle 2s infinite ease-in-out;
-    }
-  
-    /* --- 3D MAP & GLASSMORPHISM STYLES --- */
-    .glass-panel {
-      background: rgba(15, 23, 42, 0.78);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(51, 65, 85, 0.6);
-      box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.6), 0 0 1px 1px rgba(255, 255, 255, 0.05);
-      border-radius: 14px;
+
+    /* --- TRENDY AWWWARDS & GLASSMORPHISM UI --- */
+    .glass-panel, .glass-panel-awwwards {
+      background: rgba(15, 23, 42, 0.75) !important;
+      backdrop-filter: blur(16px) !important;
+      -webkit-backdrop-filter: blur(16px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.75), inset 0 1px 0 0 rgba(255, 255, 255, 0.08) !important;
+      border-radius: 16px;
       z-index: 10;
     }
+
+    .clean-card, .glass-card {
+      background: rgba(15, 23, 42, 0.75) !important;
+      backdrop-filter: blur(16px) !important;
+      -webkit-backdrop-filter: blur(16px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      border-radius: 1rem;
+      box-shadow: 0 14px 34px -8px rgba(0, 0, 0, 0.65), inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+      transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .clean-card:hover, .glass-card:hover {
+      border-color: rgba(255, 255, 255, 0.22) !important;
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 24px 48px -10px rgba(0, 0, 0, 0.85), 0 0 20px rgba(16, 185, 129, 0.14);
+    }
+
+    .card-hover-lift {
+      transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .card-hover-lift:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 20px 36px -8px rgba(0, 0, 0, 0.75), 0 0 1px 1px rgba(255, 255, 255, 0.1);
+    }
+
     .glass-btn {
       background: rgba(30, 41, 59, 0.7);
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(10px);
       border: 1px solid rgba(71, 85, 105, 0.6);
       color: #cbd5e1;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
     }
     .glass-btn:hover {
-      background: rgba(51, 65, 85, 0.9);
+      background: rgba(51, 65, 85, 0.95);
       color: #ffffff;
-      border-color: rgba(148, 163, 184, 0.8);
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.35);
+      border-color: rgba(148, 163, 184, 0.9);
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
+      transform: translateY(-1px);
     }
     .glass-btn-active {
       background: linear-gradient(135deg, #059669, #10b981) !important;
       color: #ffffff !important;
       border-color: #34d399 !important;
-      box-shadow: 0 0 16px rgba(16, 185, 129, 0.5) !important;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.65) !important;
     }
+
+    /* --- NEON GLOW EFFECTS --- */
+    .glow-green {
+      box-shadow: 0 0 18px rgba(16, 185, 129, 0.8), 0 0 36px rgba(16, 185, 129, 0.3) !important;
+    }
+    .glow-red {
+      box-shadow: 0 0 18px rgba(239, 68, 68, 0.8), 0 0 36px rgba(239, 68, 68, 0.3) !important;
+    }
+    .glow-amber {
+      box-shadow: 0 0 18px rgba(245, 158, 11, 0.8), 0 0 36px rgba(245, 158, 11, 0.3) !important;
+    }
+    .glow-blue {
+      box-shadow: 0 0 18px rgba(56, 189, 248, 0.8), 0 0 36px rgba(56, 189, 248, 0.3) !important;
+    }
+
+    /* --- 3D KILN BEACONS WITH VIBRANT NEON GLOWS --- */
     .kiln-beacon-3d {
       position: relative;
       cursor: pointer;
       transform: translate(-50%, -50%);
-      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     .kiln-beacon-3d:hover {
-      transform: translate(-50%, -50%) scale(1.22);
+      transform: translate(-50%, -50%) scale(1.25);
       z-index: 50;
     }
     .beacon-core {
-      width: 28px;
-      height: 28px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -96,18 +150,20 @@
       color: white;
       font-weight: 800;
       font-size: 10px;
-      font-family: monospace;
+      font-family: 'JetBrains Mono', monospace;
       border: 2px solid rgba(255, 255, 255, 0.95);
       position: relative;
       z-index: 2;
     }
     .meets-target .beacon-core {
       background: linear-gradient(135deg, #10b981, #047857);
-      box-shadow: 0 0 18px rgba(16, 185, 129, 0.95), 0 4px 10px rgba(0,0,0,0.6);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.95), 0 0 40px rgba(16, 185, 129, 0.45), 0 4px 12px rgba(0,0,0,0.7);
+      border-color: #a7f3d0;
     }
     .below-target .beacon-core {
       background: linear-gradient(135deg, #ef4444, #b91c1c);
-      box-shadow: 0 0 18px rgba(239, 68, 68, 0.95), 0 4px 10px rgba(0,0,0,0.6);
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.95), 0 0 40px rgba(239, 68, 68, 0.45), 0 4px 12px rgba(0,0,0,0.7);
+      border-color: #fecdd3;
     }
     .beacon-pulse {
       position: absolute;
@@ -117,40 +173,42 @@
       animation: beacon-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
     }
     .meets-target .beacon-pulse {
-      border: 2px solid rgba(16, 185, 129, 0.7);
+      border: 2px solid rgba(16, 185, 129, 0.85);
     }
     .below-target .beacon-pulse {
-      border: 2px solid rgba(239, 68, 68, 0.7);
+      border: 2px solid rgba(239, 68, 68, 0.85);
     }
     @keyframes beacon-ping {
       0% { transform: scale(0.85); opacity: 0.95; }
-      75%, 100% { transform: scale(2.4); opacity: 0; }
+      75%, 100% { transform: scale(2.5); opacity: 0; }
     }
     .beacon-pill {
       position: absolute;
       bottom: 100%;
       left: 50%;
-      transform: translateX(-50%) translateY(-5px);
+      transform: translateX(-50%) translateY(-6px);
       white-space: nowrap;
       font-size: 10px;
       font-weight: 700;
-      padding: 2px 7px;
+      padding: 2px 8px;
       border-radius: 6px;
       background: rgba(15, 23, 42, 0.92);
       color: #f1f5f9;
-      border: 1px solid rgba(71, 85, 105, 0.8);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
-      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.65);
+      backdrop-filter: blur(8px);
       pointer-events: none;
     }
+
+    /* Popups */
     .maplibregl-popup-content {
       background: rgba(15, 23, 42, 0.95) !important;
-      border: 1px solid rgba(71, 85, 105, 0.8) !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
       border-radius: 16px !important;
       color: #f1f5f9 !important;
-      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8), 0 0 25px rgba(16, 185, 129, 0.2) !important;
-      backdrop-filter: blur(16px) !important;
-      padding: 14px 16px !important;
+      box-shadow: 0 24px 48px -10px rgba(0, 0, 0, 0.9), 0 0 30px rgba(16, 185, 129, 0.25) !important;
+      backdrop-filter: blur(20px) !important;
+      padding: 16px 18px !important;
     }
     .maplibregl-popup-tip {
       border-top-color: rgba(15, 23, 42, 0.95) !important;
@@ -158,11 +216,11 @@
     }
     .maplibregl-ctrl-group {
       background: rgba(15, 23, 42, 0.85) !important;
-      border: 1px solid rgba(51, 65, 85, 0.8) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
       backdrop-filter: blur(12px) !important;
       border-radius: 12px !important;
       overflow: hidden !important;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5) !important;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6) !important;
     }
     .maplibregl-ctrl-group button {
       border-bottom: 1px solid rgba(51, 65, 85, 0.5) !important;
@@ -171,37 +229,14 @@
       border-bottom: none !important;
     }
     .maplibregl-ctrl-icon {
-      filter: invert(0.85) !important;
+      filter: invert(0.9) !important;
     }
 
-  
-    /* --- POLISHED UI/UX & MICRO-INTERACTIONS --- */
-    .smooth-transition {
-      transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .clean-card {
-      background: #0f172a;
-      border: 1px solid #1e293b;
-      border-radius: 1rem;
-      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.4);
-      transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .clean-card:hover {
-      border-color: #334155;
-    }
-    .card-hover-lift {
-      transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .card-hover-lift:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 14px 28px -6px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, 0.05);
-    }
-    
     /* Slick Sliding Toggle Switch */
     .sliding-toggle {
       position: relative;
-      width: 42px;
-      height: 22px;
+      width: 44px;
+      height: 24px;
       background: #1e293b;
       border: 1px solid #475569;
       border-radius: 9999px;
@@ -216,21 +251,66 @@
     .sliding-toggle.active {
       background: linear-gradient(135deg, #059669, #10b981) !important;
       border-color: #34d399 !important;
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.45);
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.6);
     }
     .sliding-toggle-thumb {
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
       background: #ffffff;
       border-radius: 9999px;
       transform: translateX(0px);
       transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
     }
     .sliding-toggle.active .sliding-toggle-thumb {
       transform: translateX(20px);
     }
 
+    /* Navigation Tabs */
+    .nav-tab {
+      transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .nav-tab:hover {
+      transform: translateY(-1px);
+    }
+    .nav-tab:active {
+      transform: scale(0.97);
+    }
+
+    /* Primary glowing action buttons */
+    .btn-glow-primary {
+      background: linear-gradient(135deg, #059669, #10b981, #06b6d4);
+      background-size: 200% auto;
+      color: #ffffff !important;
+      font-weight: 700;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 24px -4px rgba(16, 185, 129, 0.45);
+      transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-glow-primary:hover {
+      background-position: right center;
+      transform: translateY(-1.5px) scale(1.02);
+      box-shadow: 0 12px 28px -2px rgba(16, 185, 129, 0.6), 0 0 15px rgba(6, 182, 212, 0.3);
+    }
+    .btn-glow-primary:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .btn-glow-amber {
+      background: linear-gradient(135deg, #d97706, #f59e0b, #fbbf24);
+      color: #0f172a !important;
+      font-weight: 800;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 8px 24px -4px rgba(245, 158, 11, 0.45);
+      transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-glow-amber:hover {
+      transform: translateY(-1.5px) scale(1.02);
+      box-shadow: 0 12px 28px -2px rgba(245, 158, 11, 0.6);
+    }
+    .btn-glow-amber:active {
+      transform: translateY(0) scale(0.98);
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 selection:bg-emerald-500 selection:text-white">
@@ -369,6 +449,33 @@
 
   <!-- MAIN VIEW CONTAINER -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
+    <!-- ⚡ 2-MINUTE HACKATHON JUDGE QUICK TOUR -->
+    <div id="judge-tour-banner" class="glass-panel-awwwards p-3 px-5 flex flex-wrap items-center justify-between gap-3 border border-emerald-500/30 bg-gradient-to-r from-emerald-950/40 via-slate-900/80 to-slate-900/90 shadow-xl shadow-emerald-950/20">
+      <div class="flex items-center gap-3">
+        <span class="relative flex h-3 w-3">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 shadow-sm shadow-emerald-500"></span>
+        </span>
+        <div>
+          <div class="text-xs font-bold text-white tracking-wide flex items-center gap-2">
+            <span>⚡ Hackathon Judge Quick Tour:</span>
+            <span class="text-[11px] font-normal text-emerald-300 hidden sm:inline">Evaluate 3 core workflows in under 2 minutes</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 flex-wrap">
+        <button onclick="window.switchTab('regulator')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 flex items-center gap-1.5 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-sm">
+          <span>1. 🛰️ Surveillance &amp; FIRMS</span>
+        </button>
+        <button onclick="window.switchTab('kiln')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 flex items-center gap-1.5 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-sm">
+          <span>2. 🧮 30% Mandate Kiln Quota</span>
+        </button>
+        <button onclick="window.switchTab('supplier')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 flex items-center gap-1.5 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-sm">
+          <span>3. 🚜 Aggregator Delivery Slip</span>
+        </button>
+      </div>
+    </div>
+
 
     <!-- TAB 1: REGULATOR DASHBOARD & SATELLITE MAP -->
     <section id="view-regulator" class="space-y-6">
@@ -836,7 +943,7 @@
               </div>
             </div>
 
-            <button id="btn-find-kilns" onclick="window.matchKilnsForListing()" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-sm rounded-xl shadow-lg shadow-emerald-950/60 hover:shadow-emerald-900/80 transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center justify-center gap-2 mt-3 cursor-pointer border border-emerald-400/30">
+            <button id="btn-find-kilns" onclick="window.matchKilnsForListing()" class="btn-glow-primary w-full py-3.5 rounded-xl text-xs font-bold shadow-xl flex items-center justify-center gap-2 cursor-pointer uppercase tracking-wider">
               <svg class="w-4 h-4 text-emerald-100 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
               <span class="tracking-wide uppercase text-xs font-black">Find Nearest Brick Kilns</span>
             </button>
@@ -870,7 +977,7 @@
               <p class="text-[10px] text-slate-400 mt-1">Tamper-evident record proving straw left the agricultural parcel</p>
             </div>
 
-            <button id="btn-confirm-delivery" onclick="window.confirmSupplierDelivery()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 via-amber-400 to-emerald-500 hover:from-amber-400 hover:to-emerald-400 text-slate-950 font-black text-sm rounded-xl shadow-xl shadow-amber-950/60 hover:shadow-amber-900/80 transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center justify-center gap-2 mt-2 cursor-pointer border border-amber-300/40">
+            <button id="btn-confirm-delivery" onclick="window.confirmSupplierDelivery()" class="btn-glow-amber w-full py-3.5 rounded-xl text-xs font-black shadow-xl flex items-center justify-center gap-2 cursor-pointer uppercase tracking-wider mt-2">
               <svg class="w-4 h-4 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
               <span class="tracking-wide uppercase text-xs font-black">Confirm Delivery &amp; Issue Audit Receipt</span>
             </button>
@@ -1929,8 +2036,8 @@
       currentMapStyleKey = styleKey;
 
       const badges = {
-        'dark': 'Cyber Dark 3D',
-        'satellite': 'Satellite 3D (No API Key Required)',
+        'dark': 'CartoDB Dark Matter 3D',
+        'satellite': 'Esri Satellite 3D',
         'osm': 'Vector Roadmap 3D'
       };
       const badgeEl = document.getElementById('active-map-badge');
@@ -2263,7 +2370,7 @@
       document.getElementById('supplier-step-' + stepNum).classList.remove('hidden');
     };
 
-    window.matchKilnsForListing = function() {
+    window.supplierFindNearestKilns = window.matchKilnsForListing = function() {
       const name = document.getElementById('sup-form-name').value;
       const kind = document.getElementById('sup-form-kind').value;
       const village = document.getElementById('sup-form-village').value;
