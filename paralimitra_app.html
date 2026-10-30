@@ -6,6 +6,9 @@
   <title>Parali Mitra — Paddy Straw Supply & Brick Kiln Mandate Compliance Platform</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <!-- MapLibre GL JS (v4.7.1 - Free & Open-Source 3D Map) -->
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <!-- Leaflet CSS & JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -43,6 +46,134 @@
     .pulse-sync {
       animation: pulse-subtle 2s infinite ease-in-out;
     }
+  
+    /* --- 3D MAP & GLASSMORPHISM STYLES --- */
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.78);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(51, 65, 85, 0.6);
+      box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.6), 0 0 1px 1px rgba(255, 255, 255, 0.05);
+      border-radius: 14px;
+      z-index: 10;
+    }
+    .glass-btn {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(71, 85, 105, 0.6);
+      color: #cbd5e1;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-btn:hover {
+      background: rgba(51, 65, 85, 0.9);
+      color: #ffffff;
+      border-color: rgba(148, 163, 184, 0.8);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.35);
+    }
+    .glass-btn-active {
+      background: linear-gradient(135deg, #059669, #10b981) !important;
+      color: #ffffff !important;
+      border-color: #34d399 !important;
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.5) !important;
+    }
+    .kiln-beacon-3d {
+      position: relative;
+      cursor: pointer;
+      transform: translate(-50%, -50%);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .kiln-beacon-3d:hover {
+      transform: translate(-50%, -50%) scale(1.22);
+      z-index: 50;
+    }
+    .beacon-core {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 800;
+      font-size: 10px;
+      font-family: monospace;
+      border: 2px solid rgba(255, 255, 255, 0.95);
+      position: relative;
+      z-index: 2;
+    }
+    .meets-target .beacon-core {
+      background: linear-gradient(135deg, #10b981, #047857);
+      box-shadow: 0 0 18px rgba(16, 185, 129, 0.95), 0 4px 10px rgba(0,0,0,0.6);
+    }
+    .below-target .beacon-core {
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      box-shadow: 0 0 18px rgba(239, 68, 68, 0.95), 0 4px 10px rgba(0,0,0,0.6);
+    }
+    .beacon-pulse {
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: beacon-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+    .meets-target .beacon-pulse {
+      border: 2px solid rgba(16, 185, 129, 0.7);
+    }
+    .below-target .beacon-pulse {
+      border: 2px solid rgba(239, 68, 68, 0.7);
+    }
+    @keyframes beacon-ping {
+      0% { transform: scale(0.85); opacity: 0.95; }
+      75%, 100% { transform: scale(2.4); opacity: 0; }
+    }
+    .beacon-pill {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-5px);
+      white-space: nowrap;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: rgba(15, 23, 42, 0.92);
+      color: #f1f5f9;
+      border: 1px solid rgba(71, 85, 105, 0.8);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+      backdrop-filter: blur(6px);
+      pointer-events: none;
+    }
+    .maplibregl-popup-content {
+      background: rgba(15, 23, 42, 0.95) !important;
+      border: 1px solid rgba(71, 85, 105, 0.8) !important;
+      border-radius: 16px !important;
+      color: #f1f5f9 !important;
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8), 0 0 25px rgba(16, 185, 129, 0.2) !important;
+      backdrop-filter: blur(16px) !important;
+      padding: 14px 16px !important;
+    }
+    .maplibregl-popup-tip {
+      border-top-color: rgba(15, 23, 42, 0.95) !important;
+      border-bottom-color: rgba(15, 23, 42, 0.95) !important;
+    }
+    .maplibregl-ctrl-group {
+      background: rgba(15, 23, 42, 0.85) !important;
+      border: 1px solid rgba(51, 65, 85, 0.8) !important;
+      backdrop-filter: blur(12px) !important;
+      border-radius: 12px !important;
+      overflow: hidden !important;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5) !important;
+    }
+    .maplibregl-ctrl-group button {
+      border-bottom: 1px solid rgba(51, 65, 85, 0.5) !important;
+    }
+    .maplibregl-ctrl-group button:last-child {
+      border-bottom: none !important;
+    }
+    .maplibregl-ctrl-icon {
+      filter: invert(0.85) !important;
+    }
+
   </style>
 </head>
 <body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 selection:bg-emerald-500 selection:text-white">
@@ -253,74 +384,102 @@
       <!-- MAP & CHART DUAL WORKBENCH -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        <!-- Interactive Leaflet Map (7 Cols) -->
-        <div class="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg flex flex-col">
-          <div class="p-4 border-b border-slate-800 space-y-3 bg-slate-900/80">
-            <div class="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                  <span>Real-Time Google Maps & NASA FIRMS Surveillance</span>
-                  <span id="active-map-badge" class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-mono border border-emerald-500/30">Google Maps Satellite</span>
-                </h3>
-                <p class="text-xs text-slate-400 mt-0.5">High-resolution satellite view of Punjab and non-NCR Haryana crop parcels & brick kilns</p>
-              </div>
-
-              <!-- State Filter Dropdown -->
-              <div class="flex items-center gap-2">
-                <label for="state-filter" class="text-xs text-slate-300 font-medium">State Scope:</label>
-                <select id="state-filter" onchange="window.updateStateFilter(this.value)" class="bg-slate-800 text-amber-300 text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-slate-700 outline-none focus:border-amber-500">
-                  <option value="all" selected>All States (Punjab & Haryana)</option>
-                  <option value="Punjab">Punjab State (2,050 Kilns)</option>
-                  <option value="Haryana">Non-NCR Haryana (940 Kilns)</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Layer Switcher & Filters Toolbar -->
-            <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-800/60">
-              <!-- Google Maps Tile Layers -->
-              <div class="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
-                <button id="layer-btn-google-hybrid" onclick="window.setMapLayer('google-hybrid')" class="px-2.5 py-1 rounded-lg text-xs font-bold transition bg-emerald-600 text-white shadow">
-                  🛰️ Google Satellite
-                </button>
-                <button id="layer-btn-google-roadmap" onclick="window.setMapLayer('google-roadmap')" class="px-2.5 py-1 rounded-lg text-xs font-medium transition text-slate-400 hover:text-white">
-                  🗺️ Google Roadmap
-                </button>
-                <button id="layer-btn-google-terrain" onclick="window.setMapLayer('google-terrain')" class="px-2.5 py-1 rounded-lg text-xs font-medium transition text-slate-400 hover:text-white">
-                  🏔️ Google Terrain
-                </button>
-                <button id="layer-btn-osm" onclick="window.setMapLayer('osm')" class="px-2.5 py-1 rounded-lg text-xs font-medium transition text-slate-400 hover:text-white">
-                  🌐 OpenStreetMap
-                </button>
-              </div>
-
-              <!-- Map Overlay Controls -->
-              <div class="flex items-center gap-2">
-                <select id="map-filter" onchange="window.updateMapFilter(this.value)" class="bg-slate-800 text-slate-200 text-xs px-2.5 py-1.5 rounded-lg border border-slate-700 outline-none">
-                  <option value="all">Status: All (12)</option>
-                  <option value="below">Status: Below Target (&lt;30%)</option>
-                  <option value="meets">Status: Compliant (≥30%)</option>
-                </select>
-
-                <button onclick="window.toggleFireLayer()" id="fire-layer-toggle" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-700 bg-slate-800 hover:bg-slate-700 text-amber-300 transition">
-                  Toggle Fire Heat
-                </button>
-              </div>
-            </div>
-          </div>
+        <!-- Interactive MapLibre 3D Map (7 Cols) -->
+        <div class="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl flex flex-col relative min-h-[580px]">
           
-          <div id="regulator-map" class="w-full h-[520px] z-0"></div>
+          <!-- 3D WebGL Canvas Container -->
+          <div id="regulator-map" class="w-full h-full min-h-[580px] z-0"></div>
 
-          <div class="p-3 bg-slate-950/80 border-t border-slate-800/80 text-[11px] text-slate-400 flex flex-wrap items-center justify-between gap-2">
-            <span class="flex items-center gap-2">
-              <span class="text-white font-semibold">Google Maps API & NASA FIRMS Engine</span>
-              <span>&bull; Real-time aerial monitoring across Punjab & Haryana stubble belt</span>
-            </span>
-            <div class="flex items-center gap-3 font-mono text-xs">
-              <span class="text-emerald-400">Resolution: High (Tile Zoom 9-20)</span>
-              <span class="text-amber-400">State Center: 30.37° N, 75.85° E</span>
+          <!-- FLOATING GLASSMORPHISM CONTROLS OVERLAY -->
+
+          <!-- Top-Left Glass Card: Title & 3D Perspective Presets -->
+          <div class="absolute top-3 left-3 glass-panel p-3 max-w-[260px] space-y-2 pointer-events-auto">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <h4 class="text-xs font-bold text-white tracking-wide">3D Stubble &amp; Kiln Radar</h4>
+              </div>
+              <span id="active-map-badge" class="text-[9px] bg-emerald-500/20 text-emerald-300 font-mono px-2 py-0.5 rounded border border-emerald-500/30">Cyber Dark 3D</span>
+            </div>
+            <p class="text-[10px] text-slate-400 leading-tight">Sangrur &amp; Malerkotla Surveillance Corridor &bull; Interactive 3D Orbit</p>
+            
+            <!-- 3D Perspective Quick Switchers -->
+            <div class="flex items-center gap-1 pt-1 border-t border-slate-800/80">
+              <button onclick="window.setPerspective3D()" title="3D Oblique Perspective Angle" class="glass-btn px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1">
+                <span>📐 3D Tilt</span>
+              </button>
+              <button onclick="window.setTopDown2D()" title="Top-down 2D Orthographic View" class="glass-btn px-2 py-1 rounded-lg text-[10px] font-medium flex items-center gap-1">
+                <span>🗺️ 2D Top</span>
+              </button>
+              <button id="orbit-btn" onclick="window.toggleAutoOrbit()" title="Continuous 360° rotation" class="glass-btn px-2 py-1 rounded-lg text-[10px] font-medium flex items-center gap-1">
+                <span>🔄 360° Orbit</span>
+              </button>
             </div>
           </div>
+
+          <!-- Top-Right Glass Toolbar: Base Tile Styles -->
+          <div class="absolute top-3 right-14 glass-panel p-1.5 flex items-center gap-1 pointer-events-auto">
+            <button id="layer-btn-dark" onclick="window.setMapStyle3D('dark')" class="glass-btn glass-btn-active px-2.5 py-1 rounded-lg text-[11px] font-bold">
+              🌌 Dark Matter
+            </button>
+            <button id="layer-btn-satellite" onclick="window.setMapStyle3D('satellite')" class="glass-btn px-2.5 py-1 rounded-lg text-[11px] font-medium">
+              🛰️ Satellite 3D
+            </button>
+            <button id="layer-btn-osm" onclick="window.setMapStyle3D('osm')" class="glass-btn px-2.5 py-1 rounded-lg text-[11px] font-medium">
+              🗺️ Vector
+            </button>
+          </div>
+
+          <!-- Bottom-Left Glass Panel: Filters & Controls -->
+          <div class="absolute bottom-3 left-3 glass-panel p-2.5 flex flex-wrap items-center gap-2 pointer-events-auto">
+            <div class="flex items-center gap-1.5">
+              <span class="text-[10px] text-slate-400 font-semibold uppercase">Status:</span>
+              <select id="map-filter" onchange="window.updateMapFilter(this.value)" class="bg-slate-900 text-slate-200 text-xs px-2 py-1 rounded-lg border border-slate-700 outline-none">
+                <option value="all">All Kilns (12)</option>
+                <option value="below">Below Target (&lt;30%)</option>
+                <option value="meets">Compliant (≥30%)</option>
+              </select>
+            </div>
+
+            <div class="h-4 w-px bg-slate-700/60 hidden sm:block"></div>
+
+            <div class="flex items-center gap-1.5">
+              <span class="text-[10px] text-slate-400 font-semibold uppercase">Scope:</span>
+              <select id="state-filter" onchange="window.updateStateFilter(this.value)" class="bg-slate-900 text-amber-300 text-xs font-semibold px-2 py-1 rounded-lg border border-slate-700 outline-none">
+                <option value="all" selected>All Region</option>
+                <option value="Punjab">Punjab Cluster</option>
+                <option value="Haryana">Haryana Border</option>
+              </select>
+            </div>
+
+            <div class="h-4 w-px bg-slate-700/60 hidden sm:block"></div>
+
+            <button id="fire-layer-toggle" onclick="window.toggleFireLayer()" class="glass-btn text-amber-300 px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+              <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+              <span>Fire Clusters</span>
+            </button>
+          </div>
+
+          <!-- Bottom-Right Glass Legend -->
+          <div class="absolute bottom-3 right-3 glass-panel px-3 py-2 text-[10px] text-slate-300 space-y-1 pointer-events-auto hidden md:block">
+            <div class="font-bold text-slate-200 text-[11px] pb-0.5 border-b border-slate-700/60 flex items-center justify-between gap-3">
+              <span>3D Radar Legend</span>
+              <span class="text-slate-400 font-mono">CAQM 92</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></span>
+              <span>Compliant (≥30% Straw)</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_8px_#ef4444]"></span>
+              <span>Below Target (Gap &gt; 0)</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_#f59e0b]"></span>
+              <span>NASA FIRMS Stubble Fires</span>
+            </div>
+          </div>
+
         </div>
 
         <!-- Comparative Analytics & Bar Chart (5 Cols) -->
@@ -1063,10 +1222,6 @@
     let currentLanguage = 'en';
     let currentKilnId = 'K003';
     let mapInstance = null;
-    let kilnMarkersGroup = null;
-    let fireCellsGroup = null;
-    let isFireLayerVisible = true;
-    let mapFilter = 'all';
 
     // --- PURE DOMAIN FORMULAS (Section 5.5) ---
     function haversine(lat1, lon1, lat2, lon2) {
@@ -1304,7 +1459,7 @@
       });
 
       if (tabName === 'regulator' && mapInstance) {
-        setTimeout(() => mapInstance.invalidateSize(), 200);
+        setTimeout(() => mapInstance.resize(), 200);
       } else if (tabName === 'ai-studio') {
         window.runYieldML();
         window.runPriceML();
@@ -1338,86 +1493,403 @@
       showToast("Language Changed", currentLanguage === 'hi' ? 'भाषा बदलकर हिन्दी कर दी गई है।' : 'Switched to English interface.');
     };
 
-    // --- LEAFLET MAP INITIALIZATION ---
-    let currentBaseLayer = null;
-    let baseLayers = {};
+    // --- MAPLIBRE GL JS 3D MAP ENGINE ---
+    const STYLES_3D = {
+      'dark': {
+        version: 8,
+        sources: {
+          'carto-dark': {
+            type: 'raster',
+            tiles: [
+              'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+              'https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+              'https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+              'https://d.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png'
+            ],
+            tileSize: 256,
+            attribution: '&copy; CartoDB &copy; OpenStreetMap'
+          }
+        },
+        layers: [
+          {
+            id: 'base-tiles',
+            type: 'raster',
+            source: 'carto-dark',
+            minzoom: 0,
+            maxzoom: 20
+          }
+        ]
+      },
+      'satellite': {
+        version: 8,
+        sources: {
+          'sat-tiles': {
+            type: 'raster',
+            tiles: [
+              'https://mt0.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+              'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+              'https://mt2.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+              'https://mt3.google.com/vt/lyrs=y&x={x}&y={y}&z={z}'
+            ],
+            tileSize: 256,
+            attribution: '&copy; Google Maps'
+          }
+        },
+        layers: [
+          {
+            id: 'base-tiles',
+            type: 'raster',
+            source: 'sat-tiles',
+            minzoom: 0,
+            maxzoom: 20
+          }
+        ]
+      },
+      'osm': {
+        version: 8,
+        sources: {
+          'osm-tiles': {
+            type: 'raster',
+            tiles: [
+              'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+              'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
+              'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
+            ],
+            tileSize: 256,
+            attribution: '&copy; OpenStreetMap'
+          }
+        },
+        layers: [
+          {
+            id: 'base-tiles',
+            type: 'raster',
+            source: 'osm-tiles',
+            minzoom: 0,
+            maxzoom: 19
+          }
+        ]
+      }
+    };
+
+    let currentMapStyleKey = 'dark';
+    let kilnMarkers3D = [];
+    let isFireLayerVisible = true;
     let currentStateFilter = 'all';
+    let mapFilter = 'all';
+    let isOrbiting = false;
+    let orbitAnimationId = null;
 
     function initMap() {
       if (mapInstance) return;
-      const centerLat = CONFIG.center_lat || 30.37;
-      const centerLon = CONFIG.center_lon || 75.85;
-      const zoom = CONFIG.zoom || 9;
+      if (typeof maplibregl === 'undefined') {
+        setTimeout(initMap, 150);
+        return;
+      }
 
-      mapInstance = L.map('regulator-map', {
-        center: [centerLat, centerLon],
-        zoom: zoom,
-        maxZoom: 20
+      // MapLibre GL 3D Map Instance centered on Sangrur/Malerkotla ([75.80, 30.35])
+      mapInstance = new maplibregl.Map({
+        container: 'regulator-map',
+        style: STYLES_3D['dark'],
+        center: [75.80, 30.35],
+        zoom: 9.6,
+        pitch: 52,
+        bearing: -18,
+        attributionControl: false
       });
 
-      // --- GOOGLE MAPS API TILE PROVIDERS (Realtime Hybrid, Roadmap, Terrain) ---
-      baseLayers['google-hybrid'] = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
-        maxZoom: 20,
-        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-        attribution: '&copy; Google Maps Satellite & Imagery'
+      // Built-in 3D Navigation Controls (Zoom, Pitch, Compass Bearing)
+      mapInstance.addControl(new maplibregl.NavigationControl({
+        visualizePitch: true
+      }), 'top-right');
+
+      mapInstance.on('load', () => {
+        addFireCellsLayer();
+        renderMapLayers();
       });
-
-      baseLayers['google-roadmap'] = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
-        maxZoom: 20,
-        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-        attribution: '&copy; Google Maps'
-      });
-
-      baseLayers['google-terrain'] = L.tileLayer('https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {
-        maxZoom: 20,
-        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-        attribution: '&copy; Google Maps Terrain'
-      });
-
-      baseLayers['osm'] = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 18,
-        attribution: '&copy; OpenStreetMap contributors'
-      });
-
-      // Default to Google Maps Satellite Hybrid view for agricultural stubble inspection
-      currentBaseLayer = baseLayers['google-hybrid'];
-      currentBaseLayer.addTo(mapInstance);
-
-      fireCellsGroup = L.layerGroup().addTo(mapInstance);
-      kilnMarkersGroup = L.layerGroup().addTo(mapInstance);
-
-      renderMapLayers();
     }
 
-    window.setMapLayer = function(layerKey) {
-      if (!mapInstance || !baseLayers[layerKey]) return;
-      if (currentBaseLayer) {
-        mapInstance.removeLayer(currentBaseLayer);
+    function addFireCellsLayer() {
+      if (!mapInstance || !mapInstance.isStyleLoaded()) return;
+
+      const fireGeoJSON = {
+        type: 'FeatureCollection',
+        features: SUPPLY_CELLS.map(c => ({
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [c.lon, c.lat]
+          },
+          properties: {
+            cell_id: c.cell_id,
+            fire_count: c.fire_count_last_season,
+            supply_index: c.supply_index
+          }
+        }))
+      };
+
+      if (!mapInstance.getSource('fire-cells')) {
+        mapInstance.addSource('fire-cells', {
+          type: 'geojson',
+          data: fireGeoJSON
+        });
+
+        // 3D Soft Glowing Halo
+        mapInstance.addLayer({
+          id: 'fire-cells-halo',
+          type: 'circle',
+          source: 'fire-cells',
+          layout: {
+            visibility: isFireLayerVisible ? 'visible' : 'none'
+          },
+          paint: {
+            'circle-radius': [
+              'interpolate', ['linear'], ['get', 'supply_index'],
+              0.1, 10,
+              0.5, 20,
+              1.0, 32
+            ],
+            'circle-color': [
+              'interpolate', ['linear'], ['get', 'supply_index'],
+              0.2, '#f59e0b',
+              0.6, '#ea580c',
+              0.9, '#ef4444'
+            ],
+            'circle-opacity': 0.35,
+            'circle-blur': 0.7
+          }
+        });
+
+        // 3D Glowing Core
+        mapInstance.addLayer({
+          id: 'fire-cells-core',
+          type: 'circle',
+          source: 'fire-cells',
+          layout: {
+            visibility: isFireLayerVisible ? 'visible' : 'none'
+          },
+          paint: {
+            'circle-radius': [
+              'interpolate', ['linear'], ['get', 'supply_index'],
+              0.1, 4,
+              0.5, 7,
+              1.0, 12
+            ],
+            'circle-color': [
+              'interpolate', ['linear'], ['get', 'supply_index'],
+              0.2, '#fbbf24',
+              0.6, '#f97316',
+              0.9, '#f43f5e'
+            ],
+            'circle-opacity': 0.85
+          }
+        });
+
+        // Interactive Popup on Click
+        mapInstance.on('click', 'fire-cells-core', (e) => {
+          if (!e.features || !e.features[0]) return;
+          const p = e.features[0].properties;
+          new maplibregl.Popup({ className: 'glass-popup', offset: 12 })
+            .setLngLat(e.lngLat)
+            .setHTML(`
+              <div class="text-xs space-y-1.5 p-1 max-w-[240px]">
+                <div class="font-bold text-amber-400 flex items-center gap-1.5 border-b border-slate-700/80 pb-1">
+                  <span>🔥</span> <span>NASA FIRMS Fire Cell</span>
+                </div>
+                <div class="text-[11px] text-slate-300">Cell ID: <strong class="font-mono text-white">${p.cell_id}</strong></div>
+                <div class="text-[11px] text-slate-300">2025 Burn Count: <strong class="text-amber-300 font-bold">${p.fire_count} detections</strong></div>
+                <div class="text-[11px] text-slate-300">Surplus Supply Index: <strong class="text-emerald-400 font-bold">${Number(p.supply_index).toFixed(2)}</strong> / 1.00</div>
+                <p class="text-[9px] text-slate-400 pt-1 border-t border-slate-700/60 leading-tight">Cached active fire clusters representing relative stubble biomass density.</p>
+              </div>
+            `)
+            .addTo(mapInstance);
+        });
+
+        mapInstance.on('mouseenter', 'fire-cells-core', () => { mapInstance.getCanvas().style.cursor = 'pointer'; });
+        mapInstance.on('mouseleave', 'fire-cells-core', () => { mapInstance.getCanvas().style.cursor = ''; });
       }
-      currentBaseLayer = baseLayers[layerKey];
-      currentBaseLayer.addTo(mapInstance);
+    }
+
+    function renderMapLayers() {
+      if (!mapInstance) return;
+
+      // Update fire layer visibility
+      if (mapInstance.getLayer('fire-cells-halo')) {
+        mapInstance.setLayoutProperty('fire-cells-halo', 'visibility', isFireLayerVisible ? 'visible' : 'none');
+      }
+      if (mapInstance.getLayer('fire-cells-core')) {
+        mapInstance.setLayoutProperty('fire-cells-core', 'visibility', isFireLayerVisible ? 'visible' : 'none');
+      }
+
+      // Remove previous 3D markers
+      kilnMarkers3D.forEach(m => m.remove());
+      kilnMarkers3D = [];
+
+      KILNS.forEach(k => {
+        const needs = calculateKilnNeeds(k.kiln_id);
+        const meets = needs.status === 'meets_target';
+
+        // Filter checks
+        if (mapFilter === 'below' && meets) return;
+        if (mapFilter === 'meets' && !meets) return;
+
+        const stateName = (k.kiln_id === 'K009' || k.kiln_id === 'K010') ? 'Haryana' : 'Punjab';
+        if (currentStateFilter !== 'all' && stateName !== currentStateFilter) return;
+
+        // Custom 3D Glowing DOM Beacon Element
+        const el = document.createElement('div');
+        el.className = `kiln-beacon-3d ${meets ? 'meets-target' : 'below-target'}`;
+        el.setAttribute('title', `${k.name} (${(needs.complianceShare * 100).toFixed(1)}% co-fired)`);
+
+        el.innerHTML = `
+          <div class="beacon-pulse"></div>
+          <div class="beacon-core">
+            <span>${k.kiln_id}</span>
+          </div>
+          <div class="beacon-pill">${k.name.replace('Sample Kiln ', 'Kiln ')}</div>
+        `;
+
+        const pct = (needs.complianceShare * 100).toFixed(1);
+        const barWidth = Math.min(100, Math.round((needs.complianceShare / 0.30) * 100));
+
+        const popupHtml = `
+          <div class="text-xs space-y-2 p-1 max-w-[280px]">
+            <div class="flex items-start justify-between gap-2 border-b border-slate-700/80 pb-1.5">
+              <div>
+                <span class="font-bold text-white text-[13px] tracking-tight">${k.name}</span>
+                <div class="text-[10px] text-amber-300 font-medium">${stateName === 'Punjab' ? '🌾 Punjab Cluster' : '🏭 Haryana Border'} &bull; ${k.village}</div>
+              </div>
+              <span class="text-[9px] px-2 py-0.5 rounded-full font-extrabold uppercase shrink-0 ${meets ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'}">
+                ${meets ? 'Target Met (≥30%)' : 'Below Target'}
+              </span>
+            </div>
+
+            <!-- Co-firing Progress Bar -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-[10px]">
+                <span class="text-slate-400">Co-firing Share:</span>
+                <strong class="${meets ? 'text-emerald-400' : 'text-rose-400'} font-bold">${pct}% / 30%</strong>
+              </div>
+              <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden border border-slate-700/60">
+                <div class="h-full ${meets ? 'bg-emerald-500' : 'bg-rose-500'} transition-all duration-500 rounded-full" style="width: ${barWidth}%;"></div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-1.5 text-[10px] bg-slate-900/60 p-2 rounded-xl border border-slate-800/80 text-slate-300">
+              <div>Monthly Fuel: <strong class="text-white">${k.monthly_fuel_tonnes} t</strong></div>
+              <div>Straw Quota: <strong class="text-sky-300">${needs.strawNeededTonnes} t</strong></div>
+              <div>Delivered: <strong class="text-emerald-400 font-bold">${needs.deliveredTonnes} t</strong></div>
+              <div>Shortfall: <strong class="text-rose-400 font-bold">${needs.gapTonnes} t</strong></div>
+            </div>
+
+            <div class="pt-1.5 border-t border-slate-700/80 flex items-center justify-between gap-2">
+              <a href="https://www.google.com/maps/search/?api=1&query=${k.lat},${k.lon}" target="_blank" rel="noopener noreferrer" class="bg-slate-800 hover:bg-slate-700 text-sky-400 hover:text-sky-300 text-[10px] font-semibold px-2 py-1 rounded-lg border border-slate-700 flex items-center gap-1 transition">
+                <span>📍 GPS Map ↗</span>
+              </a>
+              <button onclick="window.inspectKiln('${k.kiln_id}')" class="bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white text-[11px] font-bold px-3 py-1 rounded-lg shadow-md shadow-emerald-950/50 transition flex items-center gap-1">
+                <span>Match Straw &raquo;</span>
+              </button>
+            </div>
+          </div>
+        `;
+
+        const popup = new maplibregl.Popup({
+          offset: 18,
+          closeButton: true,
+          className: 'glass-popup'
+        }).setHTML(popupHtml);
+
+        const marker = new maplibregl.Marker({
+          element: el,
+          anchor: 'center'
+        })
+          .setLngLat([k.lon, k.lat])
+          .setPopup(popup)
+          .addTo(mapInstance);
+
+        kilnMarkers3D.push(marker);
+      });
+    }
+
+    window.setMapStyle3D = function(styleKey) {
+      if (!mapInstance || !STYLES_3D[styleKey]) return;
+      currentMapStyleKey = styleKey;
 
       const badges = {
-        'google-hybrid': 'Google Maps Satellite',
-        'google-roadmap': 'Google Maps Roadmap',
-        'google-terrain': 'Google Maps Terrain',
-        'osm': 'OpenStreetMap'
+        'dark': 'Cyber Dark 3D',
+        'satellite': 'Google Satellite 3D',
+        'osm': 'Vector Roadmap 3D'
       };
       const badgeEl = document.getElementById('active-map-badge');
-      if (badgeEl) badgeEl.textContent = badges[layerKey] || 'Google Maps';
+      if (badgeEl) badgeEl.textContent = badges[styleKey] || '3D Map';
 
-      ['google-hybrid', 'google-roadmap', 'google-terrain', 'osm'].forEach(key => {
+      ['dark', 'satellite', 'osm'].forEach(key => {
         const btn = document.getElementById('layer-btn-' + key);
         if (btn) {
-          if (key === layerKey) {
-            btn.className = 'px-2.5 py-1 rounded-lg text-xs font-bold transition bg-emerald-600 text-white shadow';
+          if (key === styleKey) {
+            btn.className = 'glass-btn glass-btn-active px-2.5 py-1 rounded-lg text-[11px] font-bold';
           } else {
-            btn.className = 'px-2.5 py-1 rounded-lg text-xs font-medium transition text-slate-400 hover:text-white';
+            btn.className = 'glass-btn px-2.5 py-1 rounded-lg text-[11px] font-medium';
           }
         }
       });
 
-      showToast("Map Layer Changed", "Switched to " + (badges[layerKey] || layerKey));
+      mapInstance.setStyle(STYLES_3D[styleKey]);
+      mapInstance.once('style.load', () => {
+        addFireCellsLayer();
+        renderMapLayers();
+      });
+
+      showToast("3D Style Changed", "Switched to " + (badges[styleKey] || styleKey));
+    };
+
+    window.setMapLayer = window.setMapStyle3D;
+
+    window.setPerspective3D = function() {
+      if (!mapInstance) return;
+      if (isOrbiting) window.toggleAutoOrbit();
+      mapInstance.flyTo({
+        center: [75.80, 30.35],
+        zoom: 9.8,
+        pitch: 55,
+        bearing: -20,
+        essential: true,
+        duration: 1200
+      });
+      showToast("3D Oblique View", "Tilted to 55° perspective view of Sangrur / Malerkotla.");
+    };
+
+    window.setTopDown2D = function() {
+      if (!mapInstance) return;
+      if (isOrbiting) window.toggleAutoOrbit();
+      mapInstance.flyTo({
+        center: [75.80, 30.35],
+        zoom: 9.4,
+        pitch: 0,
+        bearing: 0,
+        essential: true,
+        duration: 1200
+      });
+      showToast("Top-Down 2D View", "Reset to overhead orthographic projection.");
+    };
+
+    window.toggleAutoOrbit = function() {
+      if (!mapInstance) return;
+      isOrbiting = !isOrbiting;
+      const btn = document.getElementById('orbit-btn');
+      if (isOrbiting) {
+        if (btn) btn.className = 'glass-btn glass-btn-active px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1';
+        function rotateCamera() {
+          if (!isOrbiting || !mapInstance) return;
+          mapInstance.rotateTo((mapInstance.getBearing() + 0.35) % 360, { duration: 0 });
+          orbitAnimationId = requestAnimationFrame(rotateCamera);
+        }
+        rotateCamera();
+        showToast("3D Auto-Orbit Enabled", "Rotating 360° perspective around Sangrur/Malerkotla cluster.");
+      } else {
+        if (btn) btn.className = 'glass-btn px-2 py-1 rounded-lg text-[10px] font-medium flex items-center gap-1';
+        if (orbitAnimationId) cancelAnimationFrame(orbitAnimationId);
+        showToast("Auto-Orbit Paused", "Manual 3D navigation restored.");
+      }
     };
 
     window.updateStateFilter = function(stateVal) {
@@ -1425,120 +1897,19 @@
       if (!mapInstance) return;
 
       if (stateVal === 'Punjab') {
-        mapInstance.flyTo([30.40, 75.75], 9, { duration: 1.2 });
-        showToast("State Focus: Punjab", "Zoomed to Punjab stubble corridor (Sangrur, Patiala, Ludhiana, Barnala, Bathinda).");
+        mapInstance.flyTo({ center: [75.75, 30.40], zoom: 9.8, pitch: 52, duration: 1200 });
+        showToast("State Focus: Punjab", "Zoomed to Punjab stubble corridor (Sangrur, Dhuri, Malerkotla, Sunam).");
       } else if (stateVal === 'Haryana') {
-        mapInstance.flyTo([30.22, 77.05], 9, { duration: 1.2 });
-        showToast("State Focus: Non-NCR Haryana", "Zoomed to Northern Haryana corridor (Ambala, Yamunanagar, Kurukshetra).");
+        mapInstance.flyTo({ center: [76.50, 30.25], zoom: 9.5, pitch: 50, duration: 1200 });
+        showToast("State Focus: Non-NCR Haryana", "Zoomed to Haryana border cluster.");
       } else {
-        mapInstance.flyTo([30.37, 75.85], 8, { duration: 1.2 });
-        showToast("State Focus: All Regions", "Displaying both Punjab and non-NCR Haryana mandate areas.");
+        mapInstance.flyTo({ center: [75.80, 30.35], zoom: 9.6, pitch: 52, duration: 1200 });
+        showToast("Region: Sangrur / Malerkotla", "Displaying full 3D surveillance corridor.");
       }
 
       renderMapLayers();
       renderRegulatorDashboard();
     };
-
-    function renderMapLayers() {
-      if (!mapInstance) return;
-
-      fireCellsGroup.clearLayers();
-      if (isFireLayerVisible) {
-        SUPPLY_CELLS.forEach(cell => {
-          const idx = cell.supply_index;
-          let color = '#fbbf24';
-          if (idx > 0.6) color = '#ea580c';
-          if (idx > 0.8) color = '#dc2626';
-          
-          const circle = L.circleMarker([cell.lat, cell.lon], {
-            radius: Math.max(4, Math.round(idx * 14)),
-            fillColor: color,
-            color: color,
-            weight: 1,
-            opacity: 0.7,
-            fillOpacity: 0.35 + (idx * 0.4)
-          });
-
-          circle.bindPopup(`
-            <div class="text-xs space-y-1 p-1">
-              <div class="font-bold text-amber-400">🔥 NASA FIRMS Fire Supply Cell</div>
-              <div>Cell ID: <strong class="font-mono text-slate-200">${cell.cell_id}</strong></div>
-              <div>Coord: <span class="font-mono">${cell.lat}, ${cell.lon}</span></div>
-              <div>Last Season Fires: <strong class="text-white">${cell.fire_count_last_season}</strong></div>
-              <div>Supply Availability Index: <strong class="text-emerald-400">${cell.supply_index}</strong> / 1.00</div>
-              <div class="text-[10px] text-slate-400 pt-1 border-t border-slate-700">Relative straw surplus index (satellite undercount)</div>
-            </div>
-          `);
-          fireCellsGroup.addLayer(circle);
-        });
-      }
-
-      kilnMarkersGroup.clearLayers();
-      KILNS.forEach(k => {
-        const needs = calculateKilnNeeds(k.kiln_id);
-        const meets = needs.status === 'meets_target';
-
-        if (mapFilter === 'below' && meets) return;
-        if (mapFilter === 'meets' && !meets) return;
-
-        const pinColor = meets ? '#10b981' : '#ef4444';
-        const strokeColor = meets ? '#065f46' : '#991b1b';
-
-        const iconHtml = `
-          <div style="background-color: ${pinColor}; border: 2px solid ${strokeColor}; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px ${pinColor}88;">
-            <svg style="width: 14px; height: 14px; color: white;" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm-1 11H7v-2h2v2zm0-4H7V5h2v4z"/>
-            </svg>
-          </div>
-        `;
-
-        const customIcon = L.divIcon({
-          html: iconHtml,
-          className: 'custom-kiln-pin',
-          iconSize: [26, 26],
-          iconAnchor: [13, 13]
-        });
-
-        const marker = L.marker([k.lat, k.lon], { icon: customIcon });
-
-        const stateName = (k.kiln_id === 'K009' || k.kiln_id === 'K010') ? 'Haryana' : 'Punjab';
-        
-        // Filter by State if chosen
-        if (currentStateFilter !== 'all' && stateName !== currentStateFilter) return;
-
-        marker.bindPopup(`
-          <div class="text-xs space-y-2 p-1 max-w-[280px]">
-            <div class="flex items-center justify-between gap-2 border-b border-slate-700 pb-1">
-              <div>
-                <span class="font-bold text-white text-[13px]">${k.name}</span>
-                <div class="text-[10px] text-amber-300 font-semibold">${stateName === 'Punjab' ? '🌾 Punjab State' : '🏭 Non-NCR Haryana'} &bull; ${k.village}</div>
-              </div>
-              <span class="text-[10px] px-1.5 py-0.5 rounded font-bold shrink-0 ${meets ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'}">
-                ${meets ? 'TARGET MET' : 'BELOW TARGET'}
-              </span>
-            </div>
-            <div class="space-y-1 text-slate-300 text-[11px]">
-              <div>Coordinates: <span class="font-mono text-slate-400">${k.lat}, ${k.lon}</span></div>
-              <div>Monthly Fuel: <strong class="text-white">${k.monthly_fuel_tonnes} t</strong></div>
-              <div>30% Mandate Quota: <strong class="text-sky-400">${needs.strawNeededTonnes} t</strong></div>
-              <div>Delivered to Date: <strong class="text-emerald-400">${needs.deliveredTonnes} t</strong></div>
-              <div>Co-fire Progress: <strong class="${meets ? 'text-emerald-400' : 'text-rose-400'} font-bold">${(needs.complianceShare * 100).toFixed(1)}%</strong></div>
-              <div>Compliance Gap: <strong class="text-rose-400 font-bold">${needs.gapTonnes} t</strong></div>
-            </div>
-            <div class="pt-2 border-t border-slate-700 flex items-center justify-between gap-2">
-              <a href="https://www.google.com/maps/search/?api=1&query=${k.lat},${k.lon}" target="_blank" rel="noopener noreferrer" class="bg-slate-800 hover:bg-slate-700 text-sky-400 hover:text-sky-300 text-[10px] font-semibold px-2 py-1 rounded border border-slate-700 flex items-center gap-1 transition" title="Open GPS Coordinates in Real-time Google Maps">
-                <span>📍 Google Maps ↗</span>
-              </a>
-              <button onclick="window.inspectKiln('${k.kiln_id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-2.5 py-1 rounded transition">
-                Match Straw &raquo;
-              </button>
-            </div>
-          </div>
-        `);
-
-        kilnMarkersGroup.addLayer(marker);
-      });
-    }
 
     window.toggleFireLayer = function() {
       isFireLayerVisible = !isFireLayerVisible;
