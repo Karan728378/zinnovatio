@@ -8,10 +8,17 @@ Trains cross-platform models for:
 All algorithms implemented in pure NumPy / Python for zero-dependency execution across any OS.
 """
 import os
+import sys
 import json
 import math
 import numpy as np
 import pandas as pd
+
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
 
 np.random.seed(42)
 
@@ -280,8 +287,9 @@ def generate_fire_risk_dataset(n=600):
 # --- TRAINING EXECUTION & SERIALIZATION ---
 
 def train_and_export_all():
-    base_dir = "/working_dir/c_f092691a7083ccb5"
-    models_dir = os.path.join(base_dir, "models")
+    from pathlib import Path
+    base_dir = Path(__file__).resolve().parent.parent
+    models_dir = base_dir / "models"
     os.makedirs(models_dir, exist_ok=True)
 
     # 1. Train Model 1: Biomass Yield Predictor
@@ -295,7 +303,7 @@ def train_and_export_all():
     y1_pred = rf_yield.predict(X1_te)
     r2_yield = 1.0 - (np.sum((y1_te - y1_pred) ** 2) / np.sum((y1_te - np.mean(y1_te)) ** 2))
     mae_yield = np.mean(np.abs(y1_te - y1_pred))
-    print(f"  Yield Predictor Test R^2: {r2_yield:.3f}, MAE: {mae_yield:.2f} tonnes")
+    print(f"  Yield Predictor Synthetic Test R^2: {r2_yield:.3f}, MAE: {mae_yield:.2f} tonnes")
 
     # 2. Train Model 2: Delivered Price Predictor
     print("Training Model 2: Dynamic Delivered Price Predictor...")
@@ -308,7 +316,7 @@ def train_and_export_all():
     y2_pred = tree_price.predict(X2_te)
     r2_price = 1.0 - (np.sum((y2_te - y2_pred) ** 2) / np.sum((y2_te - np.mean(y2_te)) ** 2))
     mae_price = np.mean(np.abs(y2_te - y2_pred))
-    print(f"  Price Predictor Test R^2: {r2_price:.3f}, MAE: ₹{mae_price:.1f}/tonne")
+    print(f"  Price Predictor Synthetic Test R^2: {r2_price:.3f}, MAE: Rs. {mae_price:.1f}/tonne")
 
     # 3. Train Model 3: Fire Risk Classifier
     print("Training Model 3: Stubble Fire Risk Classifier...")
@@ -320,44 +328,62 @@ def train_and_export_all():
     clf_risk.fit(X3_tr, y3_tr)
     y3_pred = clf_risk.predict(X3_te)
     acc_risk = np.mean(y3_pred == y3_te)
-    print(f"  Fire Risk Classifier Test Accuracy: {acc_risk * 100:.1f}%")
+    print(f"  Fire Risk Classifier Synthetic Test Accuracy: {acc_risk * 100:.1f}%")
 
-    # Metrics Summary
+    # Metrics Summary with Honest Provenance & Boundary Clarifications
     metrics = {
+        "provenance": {
+            "type": "synthetic_demonstration_models",
+            "agronomic_references": [
+                "Punjab Agricultural University (PAU) Rice-Wheat cropping system stubble ratios",
+                "Commission for Air Quality Management (CAQM) biomass co-firing economics",
+                "VIIRS 375m active fire cluster proximity distributions"
+            ],
+            "intended_use": "Demonstration, planning, and price guidance for brick kiln co-firing. Must be calibrated with regional weighbridge and farm audit records before commercial contracting."
+        },
         "yield_predictor": {
             "model_type": "RandomForestRegressor",
+            "evaluation_nature": "synthetic_holdout_validation",
             "features": feat1,
             "train_samples": int(split1),
             "test_samples": int(len(X1) - split1),
             "test_r2": round(float(r2_yield), 3),
-            "test_mae_tonnes": round(float(mae_yield), 2)
+            "test_mae_tonnes": round(float(mae_yield), 2),
+            "synthetic_test_r2": round(float(r2_yield), 3),
+            "synthetic_test_mae_tonnes": round(float(mae_yield), 2)
         },
         "price_predictor": {
             "model_type": "DecisionTreeRegressor",
+            "evaluation_nature": "synthetic_holdout_validation",
             "features": feat2,
             "train_samples": int(split2),
             "test_samples": int(len(X2) - split2),
             "test_r2": round(float(r2_price), 3),
-            "test_mae_rupees": round(float(mae_price), 2)
+            "test_mae_rupees": round(float(mae_price), 2),
+            "synthetic_test_r2": round(float(r2_price), 3),
+            "synthetic_test_mae_rupees": round(float(mae_price), 2)
         },
         "fire_risk_classifier": {
             "model_type": "DecisionTreeClassifier",
+            "evaluation_nature": "synthetic_holdout_validation",
             "features": feat3,
             "classes": ["Low Risk", "Moderate Risk", "High Risk"],
             "train_samples": int(split3),
             "test_samples": int(len(X3) - split3),
-            "test_accuracy": round(float(acc_risk), 3)
+            "test_accuracy": round(float(acc_risk), 3),
+            "synthetic_test_accuracy": round(float(acc_risk), 3)
         }
     }
 
-    metrics_file = os.path.join(models_dir, "metrics.json")
-    with open(metrics_file, "w") as f:
+    metrics_file = models_dir / "metrics.json"
+    with open(metrics_file, "w", encoding="utf-8") as f:
         json.dump(metrics, f, indent=2)
 
     # Export Trained Weights / Structures to portable JSON
     trained_export = {
         "version": "1.0.0",
         "timestamp": "2026-10-30",
+        "provenance": "synthetic_demonstration_models",
         "yield_forest": rf_yield.to_dict(),
         "price_tree": tree_price.root.to_dict(),
         "risk_tree": clf_risk.to_dict(),
@@ -368,8 +394,8 @@ def train_and_export_all():
         }
     }
 
-    models_json_file = os.path.join(models_dir, "trained_models.json")
-    with open(models_json_file, "w") as f:
+    models_json_file = models_dir / "trained_models.json"
+    with open(models_json_file, "w", encoding="utf-8") as f:
         json.dump(trained_export, f)
 
     print(f"Models successfully trained and exported to {models_json_file} and {metrics_file}")

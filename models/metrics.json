@@ -1,6 +1,18 @@
 {
+  "provenance": {
+    "type": "synthetic_demonstration_models",
+    "disclaimer": "All metrics below are self-consistency scores evaluated on held-out synthetic data, NOT real-world accuracy. These models were trained and evaluated on algorithmically-generated data calibrated to agronomic literature. They must be calibrated with regional weighbridge records and farm audit data before commercial contracting.",
+    "agronomic_references": [
+      "Punjab Agricultural University (PAU) Rice-Wheat cropping system stubble ratios",
+      "Commission for Air Quality Management (CAQM) biomass co-firing economics",
+      "VIIRS 375m active fire cluster proximity distributions"
+    ],
+    "intended_use": "Demonstration, planning, and price guidance for brick kiln co-firing. Must be calibrated with regional weighbridge and farm audit records before commercial contracting."
+  },
   "yield_predictor": {
     "model_type": "RandomForestRegressor",
+    "evaluation_nature": "synthetic_self_consistency",
+    "evaluation_note": "Trained and evaluated on synthetic data only. Not validated against real harvest measurements.",
     "features": [
       "acres",
       "crop_variety_idx",
@@ -11,10 +23,20 @@
     "train_samples": 480,
     "test_samples": 120,
     "test_r2": 0.982,
-    "test_mae_tonnes": 3.26
+    "test_mae_tonnes": 3.26,
+    "synthetic_self_consistency_r2": 0.982,
+    "synthetic_self_consistency_mae_tonnes": 3.26,
+    "in_training_range": {
+      "acres": [0.5, 50.0],
+      "grain_yield_qtl_acre": [10.0, 60.0],
+      "ndvi": [0.3, 0.95],
+      "cutting_height_cm": [8.0, 40.0]
+    }
   },
   "price_predictor": {
     "model_type": "DecisionTreeRegressor",
+    "evaluation_nature": "synthetic_self_consistency",
+    "evaluation_note": "Trained and evaluated on synthetic data only. Not validated against real market prices.",
     "features": [
       "distance_km",
       "form_idx",
@@ -25,10 +47,19 @@
     "train_samples": 480,
     "test_samples": 120,
     "test_r2": 0.967,
-    "test_mae_rupees": 52.99
+    "test_mae_rupees": 52.99,
+    "synthetic_self_consistency_r2": 0.967,
+    "synthetic_self_consistency_mae_rupees": 52.99,
+    "in_training_range": {
+      "distance_km": [1.0, 150.0],
+      "moisture_pct": [8.0, 30.0],
+      "harvest_week": [1, 4]
+    }
   },
   "fire_risk_classifier": {
     "model_type": "DecisionTreeClassifier",
+    "evaluation_nature": "synthetic_self_consistency",
+    "evaluation_note": "Trained and evaluated on synthetic data only. Not validated against real fire incident records.",
     "features": [
       "days_to_wheat_sowing",
       "dist_to_kiln_km",
@@ -42,6 +73,7 @@
     ],
     "train_samples": 480,
     "test_samples": 120,
-    "test_accuracy": 0.7
+    "test_accuracy": 0.70,
+    "synthetic_self_consistency_accuracy": 0.70
   }
 }

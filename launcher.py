@@ -12,6 +12,12 @@ import webbrowser
 import threading
 import json
 
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
 PORT = 8000
 HOST = "127.0.0.1"
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -33,13 +39,13 @@ def check_dependencies():
 
 def run_fastapi_server():
     print("=" * 60)
-    print("🚀 Starting Parali Mitra on FastAPI + Uvicorn...")
-    print(f"👉 Local URL: http://{HOST}:{PORT}")
-    print(f"👉 Swagger API Docs: http://{HOST}:{PORT}/docs")
-    print(f"👉 Interactive Web App: http://{HOST}:{PORT}/paralimitra_app.html")
+    print("Starting Parali Mitra on FastAPI + Uvicorn...")
+    print(f"Local URL: http://{HOST}:{PORT}")
+    print(f"Swagger API Docs: http://{HOST}:{PORT}/docs")
+    print(f"Interactive Web App: http://{HOST}:{PORT}/paralimitra_app.html")
     print("=" * 60)
     import uvicorn
-    # Add direct resolution hook for 9p / cross-platform safety
+    # Add direct resolution hook for cross-platform safety
     import importlib.util
     class DirectPathFinder:
         @classmethod
@@ -61,35 +67,64 @@ def run_fastapi_server():
 
 def run_builtin_server():
     print("=" * 60)
-    print("⚡ FastAPI not detected. Running Standalone Standard-Library HTTP Server...")
-    print(f"👉 Running on any OS with pure Python standard library!")
-    print(f"👉 Application URL: http://{HOST}:{PORT}/")
+    print("WARNING: FastAPI not detected. API disabled; install requirements (pip install -r requirements.txt)")
+    print("Running Standalone Standard-Library HTTP Fallback Server...")
+    print(f"Application URL: http://{HOST}:{PORT}/")
     print("=" * 60)
     from http.server import SimpleHTTPRequestHandler, HTTPServer
+    import mimetypes
 
-    app_html_path = os.path.join(BASE_DIR, "artifacts", "file_generation", "ttl=63d", "output", "kilnlink_app.html")
-    if not os.path.exists(app_html_path):
-        app_html_path = os.path.join(BASE_DIR, "kilnlink_app.html")
+    candidate_files = [
+        os.path.join(BASE_DIR, "paralimitra_app.html"),
+        os.path.join(BASE_DIR, "index.html"),
+        os.path.join(BASE_DIR, "frontend", "index.html"),
+        os.path.join(BASE_DIR, "artifacts", "file_generation", "ttl=63d", "output", "kilnlink_app.html"),
+        os.path.join(BASE_DIR, "kilnlink_app.html")
+    ]
+    app_html_path = None
+    for cand in candidate_files:
+        if os.path.exists(cand):
+            app_html_path = cand
+            break
+
+    static_allow_dir = os.path.join(BASE_DIR, "frontend", "public")
 
     class ParaliMitraHandler(SimpleHTTPRequestHandler):
         def do_GET(self):
-            if self.path in ("/", "/index.html", "/paralimitra_app.html", "/app"):
+            clean_path = self.path.split("?")[0].split("#")[0]
+            if clean_path in ("/", "/index.html", "/paralimitra_app.html", "/app"):
                 self.send_response(200)
                 self.send_header("Content-type", "text/html; charset=utf-8")
                 self.end_headers()
-                if os.path.exists(app_html_path):
+                if app_html_path and os.path.exists(app_html_path):
                     with open(app_html_path, "rb") as f:
                         self.wfile.write(f.read())
                 else:
                     self.wfile.write(b"<h1>Parali Mitra is loading...</h1>")
                 return
-            elif self.path == "/health":
+            elif clean_path == "/health":
                 self.send_response(200)
                 self.send_header("Content-type", "application/json")
                 self.end_headers()
                 self.wfile.write(json.dumps({"status": "ok", "app": "Parali Mitra", "version": "1.0.0"}).encode())
                 return
-            super().do_GET()
+            elif clean_path.startswith("/static/") and os.path.exists(static_allow_dir):
+                rel_sub = clean_path[len("/static/"):].lstrip("/\\")
+                target_file = os.path.abspath(os.path.join(static_allow_dir, rel_sub))
+                if target_file.startswith(static_allow_dir) and os.path.isfile(target_file):
+                    mime, _ = mimetypes.guess_type(target_file)
+                    self.send_response(200)
+                    self.send_header("Content-type", mime or "application/octet-stream")
+                    self.end_headers()
+                    with open(target_file, "rb") as f:
+                        self.wfile.write(f.read())
+                    return
+
+            # Explicit 404 for all other paths - never serve repo root
+            self.send_response(404)
+            self.send_header("Content-type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps({"detail": "Not Found"}).encode())
 
     server = HTTPServer((HOST, PORT), ParaliMitraHandler)
     server.serve_forever()

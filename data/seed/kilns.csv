@@ -1,13 +1,13 @@
-kiln_id,name,lat,lon,village,monthly_fuel_tonnes
-K001,Sample Kiln 1,30.25,75.84,Sangrur,100.0
-K002,Sample Kiln 2,30.31,75.91,Dhuri,80.0
-K003,Sample Kiln 3,30.5,75.9,Malerkotla,120.0
-K004,Sample Kiln 4,30.18,75.79,Sunam,110.0
-K005,Sample Kiln 5,30.42,75.75,Ahmedgarh,90.0
-K006,Sample Kiln 6,30.12,75.98,Lehragaga,130.0
-K007,Sample Kiln 7,30.29,75.68,Longowal,100.0
-K008,Sample Kiln 8,30.37,76.02,Bhawanigarh,115.0
-K009,Sample Kiln 9,30.08,75.88,Dirba,95.0
-K010,Sample Kiln 10,30.46,75.96,Amargarh,105.0
-K011,Sample Kiln 11,30.21,76.04,Moonak,125.0
-K012,Sample Kiln 12,30.34,75.78,Sherpur,90.0
+kiln_id,name,lat,lon,village,state,monthly_fuel_tonnes
+K001,Sample Kiln 1,30.25,75.84,Sangrur,Punjab,100.0
+K002,Sample Kiln 2,30.31,75.91,Dhuri,Punjab,80.0
+K003,Sample Kiln 3,30.5,75.9,Malerkotla,Punjab,120.0
+K004,Sample Kiln 4,30.18,75.79,Sunam,Punjab,110.0
+K005,Sample Kiln 5,30.42,75.75,Ahmedgarh,Punjab,90.0
+K006,Sample Kiln 6,30.12,75.98,Lehragaga,Punjab,130.0
+K007,Sample Kiln 7,30.29,75.68,Longowal,Punjab,100.0
+K008,Sample Kiln 8,30.37,76.02,Bhawanigarh,Punjab,115.0
+K009,Sample Kiln 9,30.08,75.88,Dirba,Punjab,95.0
+K010,Sample Kiln 10,30.46,75.96,Amargarh,Punjab,105.0
+K011,Sample Kiln 11,30.21,76.04,Moonak,Punjab,125.0
+K012,Sample Kiln 12,30.34,75.78,Sherpur,Punjab,90.0

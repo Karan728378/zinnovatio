@@ -6,12 +6,18 @@ venv/
 
 # Environment & credentials
 .env
+.env.*
 .env.local
 .env.*.local
+backend/.env
+backend/.env.*
+*.env
 
 # Databases & raw data
 *.db
 *.sqlite3
+data/*.db
+data/*.sqlite3
 data/raw/
 
 # Python cache
@@ -20,10 +26,14 @@ __pycache__/
 *$py.class
 .pytest_cache/
 
-# Build artifacts
+# Build artifacts & temp
 dist/
 dist-ssr/
 build/
 *.local
-
+temp_zino_build/
+temp_zino_build_safe/
+*.log
 *.zip
+*.sha256
+scratch/
