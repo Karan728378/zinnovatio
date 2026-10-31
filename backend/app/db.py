@@ -188,6 +188,18 @@ def init_db(force_reload_seeds: bool = False, db_path: Optional[str] = None):
     """)
 
         # Ensure role column exists on suppliers table
+        # Ensure extra columns exist on supply_cells table
+    cur.execute("PRAGMA table_info(supply_cells);")
+    cell_cols = [r[1] for r in cur.fetchall()]
+    if "acq_date" not in cell_cols:
+        cur.execute("ALTER TABLE supply_cells ADD COLUMN acq_date TEXT;")
+    if "acq_time" not in cell_cols:
+        cur.execute("ALTER TABLE supply_cells ADD COLUMN acq_time TEXT;")
+    if "bright_ti4" not in cell_cols:
+        cur.execute("ALTER TABLE supply_cells ADD COLUMN bright_ti4 REAL;")
+    if "frp" not in cell_cols:
+        cur.execute("ALTER TABLE supply_cells ADD COLUMN frp REAL;")
+
     cur.execute("PRAGMA table_info(suppliers);")
     sup_cols = [r[1] for r in cur.fetchall()]
     if "role" not in sup_cols:

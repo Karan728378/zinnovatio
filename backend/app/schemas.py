@@ -37,6 +37,10 @@ class SupplyCellItem(BaseModel):
     lon: float
     fire_count_last_season: int
     supply_index: float
+    acq_date: Optional[str] = None
+    acq_time: Optional[str] = None
+    bright_ti4: Optional[float] = None
+    frp: Optional[float] = None
 
 class KilnNeedsResponse(BaseModel):
     kiln_id: str

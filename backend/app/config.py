@@ -19,10 +19,19 @@ def _init_dotenv():
             root_env = base_dir / ".env"
             backend_env = base_dir / "backend" / ".env"
             if root_env.exists():
-                load_dotenv(dotenv_path=root_env, override=False)
+                try:
+                    load_dotenv(dotenv_path=root_env, override=False, encoding="utf-8")
+                except Exception:
+                    try:
+                        load_dotenv(dotenv_path=root_env, override=False, encoding="utf-16")
+                    except Exception:
+                        pass
             if backend_env.exists():
-                load_dotenv(dotenv_path=backend_env, override=False)
-        except ImportError:
+                try:
+                    load_dotenv(dotenv_path=backend_env, override=False, encoding="utf-8")
+                except Exception:
+                    pass
+        except Exception:
             pass
         _DOTENV_LOADED = True
 

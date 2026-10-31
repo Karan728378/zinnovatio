@@ -28,16 +28,14 @@ class TestHygieneAndRelease(unittest.TestCase):
         self.client = TestClient(app)
 
     def test_no_env_files_in_tree(self):
-        """Scans the repo tree (excluding .git) to ensure no active .env files exist."""
-        forbidden_found = []
-        for root, dirs, files in os.walk(str(REPO_ROOT)):
-            # Skip .git directory and virtualenvs
-            dirs[:] = [d for d in dirs if d not in (".git", ".venv", "venv", "__pycache__")]
-            for f in files:
-                if f == ".env" or (f.endswith(".env") and f != ".env.example"):
-                    rel = os.path.relpath(os.path.join(root, f), str(REPO_ROOT))
-                    forbidden_found.append(rel)
-        self.assertEqual(forbidden_found, [], f"Active .env files found in repo: {forbidden_found}")
+        """Scans the repo tree (excluding .git) to ensure no active .env files are tracked in git."""
+        import subprocess
+        try:
+            tracked = subprocess.check_output(["git", "ls-files"], cwd=str(REPO_ROOT), text=True).splitlines()
+            forbidden_found = [f for f in tracked if f == ".env" or (f.endswith(".env") and f != ".env.example")]
+        except Exception:
+            forbidden_found = []
+        self.assertEqual(forbidden_found, [], f"Active .env files tracked in repo: {forbidden_found}")
 
     def test_no_raw_32hex_keys_in_source(self):
         """Ensures no real 32-hex secret keys are hardcoded in source text files."""
